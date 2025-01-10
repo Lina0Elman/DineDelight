@@ -22,12 +22,17 @@ import androidx.compose.material.icons.filled.Person
 fun HomeScreen(navController: NavController) {
     val firebaseAuth = FirebaseAuth.getInstance()
     var currentUser by remember { mutableStateOf(firebaseAuth.currentUser) }
-    var showSignInDialog by remember { mutableStateOf(false) } // State to control dialog visibility
 
     // Firebase Authentication state listener
     DisposableEffect(Unit) {
         val authStateListener = FirebaseAuth.AuthStateListener { auth ->
             currentUser = auth.currentUser
+            if (auth.currentUser == null) {
+                // Navigate back to login when user signs out
+                navController.navigate("login") {
+                    popUpTo("home") { inclusive = true }
+                }
+            }
         }
         firebaseAuth.addAuthStateListener(authStateListener)
         onDispose {
@@ -94,28 +99,8 @@ fun HomeScreen(navController: NavController) {
                     Button(onClick = { firebaseAuth.signOut() }) {
                         Text("Sign Out")
                     }
-                } else {
-                    // Prompt user to sign in if not authenticated
-                    Text(
-                        text = "Please sign in to enjoy all features!",
-                        style = MaterialTheme.typography.bodyLarge
-                    )
-                    Spacer(modifier = Modifier.height(16.dp))
-                    Button(onClick = { showSignInDialog = true }) {
-                        Text("Sign In")
-                    }
                 }
             }
-        }
-        if (showSignInDialog) {
-            SignInDialog(
-                onDismiss = { showSignInDialog = false },
-                onSignIn = { email, password ->
-                    handleSignIn(firebaseAuth, email, password) {
-                        showSignInDialog = false // Close dialog after successful sign-in
-                    }
-                }
-            )
         }
     }
 }
