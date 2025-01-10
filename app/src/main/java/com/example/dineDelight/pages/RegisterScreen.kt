@@ -77,17 +77,21 @@ fun RegisterScreen(navController: NavController) {
         Button(
             onClick = {
                 if (password == confirmPassword) {
-                    FirebaseAuth.getInstance()
-                        .createUserWithEmailAndPassword(email, password)
-                        .addOnCompleteListener { task ->
-                            if (task.isSuccessful) {
-                                navController.navigate("home") {
-                                    popUpTo("register") { inclusive = true }
+                    if (email.isNotEmpty() && password.isNotEmpty()) {
+                        FirebaseAuth.getInstance()
+                            .createUserWithEmailAndPassword(email, password)
+                            .addOnCompleteListener { task ->
+                                if (task.isSuccessful) {
+                                    navController.navigate("home") {
+                                        popUpTo("register") { inclusive = true }
+                                    }
+                                } else {
+                                    errorMessage = task.exception?.message
                                 }
-                            } else {
-                                errorMessage = task.exception?.message
                             }
-                        }
+                    } else {
+                        errorMessage = "Email and Password cannot be empty"
+                    }
                 } else {
                     errorMessage = "Passwords do not match"
                 }

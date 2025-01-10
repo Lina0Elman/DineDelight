@@ -1,8 +1,13 @@
 package com.example.dineDelight
 
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.MaterialTheme.colorScheme
+import androidx.compose.material3.MaterialTheme.typography
+import androidx.compose.material3.Text
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
@@ -25,28 +30,18 @@ class MainActivity : ComponentActivity() {
 
             NavHost(navController, startDestination = "login") {
                 composable("login") {
-                    // Pass onLogin and onRegister lambdas to LoginScreen
                     LoginScreen(
                         navController = navController,
                         onLogin = { email, password ->
                             auth.signInWithEmailAndPassword(email, password)
                                 .addOnCompleteListener { task ->
                                     if (task.isSuccessful) {
+                                        Log.d("Login", "Login successful!")
                                         navController.navigate("home") {
                                             popUpTo("login") { inclusive = true }
                                         }
                                     } else {
-                                        // Handle login error (e.g., show a Toast)
-                                    }
-                                }
-                        },
-                        onRegister = { email, password ->
-                            auth.createUserWithEmailAndPassword(email, password)
-                                .addOnCompleteListener { task ->
-                                    if (task.isSuccessful) {
-                                        // Handle successful registration (e.g., navigate to home or show success message)
-                                    } else {
-                                        // Handle registration error (e.g., show a Toast)
+                                        Log.d("Login Error", task.exception?.message ?: "Unknown error")
                                     }
                                 }
                         }
