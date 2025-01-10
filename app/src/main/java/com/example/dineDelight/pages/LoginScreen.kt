@@ -26,11 +26,11 @@ import androidx.navigation.NavController
 @Composable
 fun LoginScreen(
     navController: NavController,
-    onLogin: (String, String) -> Unit
+    onLogin: (String, String) -> Unit,
+    errorMessage: String?
 ) {
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
-    var errorMessage by remember { mutableStateOf<String?>(null) }
 
     Column(
         modifier = Modifier
@@ -65,13 +65,7 @@ fun LoginScreen(
         Spacer(modifier = Modifier.height(16.dp))
 
         Button(
-            onClick = {
-                if (email.isNotEmpty() && password.isNotEmpty()) {
-                    onLogin(email, password) // Call the login function passed as a parameter
-                } else {
-                    errorMessage = "Email and Password are required"
-                }
-            },
+            onClick = { onLogin(email, password) },
             modifier = Modifier.fillMaxWidth()
         ) {
             Text("Login")
@@ -83,9 +77,9 @@ fun LoginScreen(
             Text("Don't have an account? Register")
         }
 
-        if (errorMessage != null) {
+        if (!errorMessage.isNullOrEmpty()) {
             Text(
-                text = errorMessage!!,
+                text = errorMessage,
                 color = MaterialTheme.colorScheme.error,
                 style = MaterialTheme.typography.bodySmall
             )
