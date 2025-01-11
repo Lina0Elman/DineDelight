@@ -2,6 +2,8 @@ package com.example.dineDelight.pages
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -54,9 +56,10 @@ fun RestaurantDetailsScreen(navController: NavController, restaurant: Restaurant
             CircularProgressIndicator()
         } else {
             restaurantMenu?.let { menu ->
-                // Display the meals in the menu
-                menu.meals.forEach { meal ->
-                    MealCard(meal)
+                LazyColumn {
+                    items(menu.meals) { meal ->
+                        MealCard(meal)
+                    }
                 }
             } ?: Text(text = "No menu available.")
         }
