@@ -13,6 +13,7 @@ import androidx.navigation.NavController
 import androidx.compose.material3.IconButton
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.ui.draw.clip
 import coil.compose.AsyncImage
 import com.example.dineDelight.models.Meal
 import com.example.dineDelight.models.Restaurant
@@ -85,7 +86,8 @@ interface MealService {
 fun MealCard(meal: Meal) {
     Card(
         modifier = Modifier
-            .fillMaxWidth(),
+            .fillMaxWidth()
+            .padding(vertical = 8.dp),
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
     ) {
         Row(
@@ -101,7 +103,9 @@ fun MealCard(meal: Meal) {
             AsyncImage(
                 model = meal.strMealThumb,
                 contentDescription = null,
-                modifier = Modifier.size(100.dp)
+                modifier = Modifier
+                    .size(100.dp)
+                    .clip(MaterialTheme.shapes.medium)
             )
         }
     }
