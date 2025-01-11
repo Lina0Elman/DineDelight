@@ -27,7 +27,6 @@ import retrofit2.http.Query
 fun RestaurantDetailsScreen(navController: NavController, restaurant: Restaurant) {
     var restaurantMenu by remember { mutableStateOf<RestaurantMenu?>(null) }
     var loading by remember { mutableStateOf(true) }
-    val coroutineScope = rememberCoroutineScope()
 
     // Use LaunchedEffect to perform the network call
     LaunchedEffect(restaurant) {
@@ -53,6 +52,16 @@ fun RestaurantDetailsScreen(navController: NavController, restaurant: Restaurant
         Text(text = "Restaurant Name: ${restaurant.name}")
         Text(text = "Description: ${restaurant.description}")
         Spacer(modifier = Modifier.height(8.dp))
+
+        Button(
+            onClick = { navController.navigate("reserve/${restaurant.id}") }, // Navigate to reservation screen
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Text(text = "Reserve a Slot")
+        }
+
+        Spacer(modifier = Modifier.height(8.dp))
+
         if (loading) {
             Box(
                 modifier = Modifier.fillMaxSize(),

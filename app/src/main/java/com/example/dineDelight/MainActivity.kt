@@ -19,6 +19,7 @@ import com.example.dineDelight.pages.HomeScreen
 import com.example.dineDelight.pages.LoginScreen
 import com.example.dineDelight.pages.RegisterScreen
 import com.example.dineDelight.pages.RestaurantDetailsScreen
+import com.example.dineDelight.pages.ReservationScreen
 import com.example.dineDelight.repositories.RestaurantRepository
 import com.example.dineDelight.ui.theme.MyApplicationTheme
 import com.google.firebase.FirebaseApp
@@ -76,6 +77,10 @@ class MainActivity : ComponentActivity() {
                         restaurants.forEach { restaurant ->
                             composable("restaurant/${restaurant.id}") { 
                                 RestaurantDetailsScreen(navController, restaurant) 
+                            }
+
+                            composable("reserve/${restaurant.id}") {
+                                ReservationScreen(navController, restaurant)
                             }
                         }
                     }
