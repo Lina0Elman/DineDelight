@@ -52,7 +52,7 @@ fun RestaurantDetailsScreen(navController: NavController, restaurant: Restaurant
         Spacer(modifier = Modifier.height(16.dp))
         Text(text = "Restaurant Name: ${restaurant.name}")
         Text(text = "Description: ${restaurant.description}")
-
+        Spacer(modifier = Modifier.height(8.dp))
         if (loading) {
             CircularProgressIndicator()
         } else {
