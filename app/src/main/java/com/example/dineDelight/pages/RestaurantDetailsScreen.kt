@@ -54,7 +54,12 @@ fun RestaurantDetailsScreen(navController: NavController, restaurant: Restaurant
         Text(text = "Description: ${restaurant.description}")
         Spacer(modifier = Modifier.height(8.dp))
         if (loading) {
-            CircularProgressIndicator()
+            Box(
+                modifier = Modifier.fillMaxSize(),
+                contentAlignment = Alignment.Center
+            ) {
+                CircularProgressIndicator()
+            }
         } else {
             restaurantMenu?.let { menu ->
                 LazyColumn {
