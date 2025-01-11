@@ -28,7 +28,7 @@ class MainActivity : ComponentActivity() {
                         composable("home") { HomeScreen(navController) }
                         composable("restaurant/{restaurantId}") { backStackEntry ->
                             val restaurantId = backStackEntry.arguments?.getString("restaurantId") ?: ""
-                            RestaurantDetailsScreen(restaurantId)
+                            RestaurantDetailsScreen(navController, restaurantId)
                         }
                     }
                 }
