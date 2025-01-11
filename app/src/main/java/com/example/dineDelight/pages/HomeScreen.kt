@@ -23,6 +23,8 @@ import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.Icon
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.foundation.lazy.items
+import androidx.compose.ui.layout.ContentScale
+import coil.compose.AsyncImage
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -134,7 +136,8 @@ fun HomeScreen(navController: NavController) {
                 LazyColumn {
                     items(restaurants.filter { it.name.contains(searchQuery, ignoreCase = true) }) { restaurant ->
                         RestaurantCard(restaurant) {
-                            // Handle restaurant click
+                            // Navigate to RestaurantDetails with the restaurantId
+                            navController.navigate("restaurant/${restaurant.id}")
                         }
                     }
                 }
@@ -183,6 +186,27 @@ private fun RestaurantCard(
                 text = "Available slots: ${restaurant.availableSlots.joinToString(", ")}",
                 style = MaterialTheme.typography.bodyMedium
             )
+        }
+    }
+}
+
+data class Meal(
+    val strMeal: String,
+    val strMealThumb: String,
+    val idMeal: String
+)
+
+@Composable
+fun MealCard(meal: Meal, onMealClick: () -> Unit) {
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable(onClick = onMealClick),
+        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
+    ) {
+        Column(modifier = Modifier.padding(16.dp)) {
+            AsyncImage(model = meal.strMealThumb, contentDescription = null)
+            Text(text = meal.strMeal, style = MaterialTheme.typography.titleLarge)
         }
     }
 }

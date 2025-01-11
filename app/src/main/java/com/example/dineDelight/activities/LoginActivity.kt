@@ -9,7 +9,7 @@
 //import androidx.navigation.compose.NavHost
 //import androidx.navigation.compose.composable
 //import androidx.navigation.compose.rememberNavController
-//import com.example.dineDelight.MainActivity
+//import com.example.dineDelight.com.example.dineDelight.MainActivity
 //import com.example.dineDelight.pages.RegisterScreen
 //import com.google.firebase.auth.FirebaseAuth
 //
@@ -61,7 +61,7 @@
 //    }
 //
 //    private fun navigateToHome() {
-//        startActivity(Intent(this, MainActivity::class.java))
+//        startActivity(Intent(this, com.example.dineDelight.MainActivity::class.java))
 //        finish()
 //    }
 //}
