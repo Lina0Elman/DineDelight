@@ -23,6 +23,7 @@ import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.Icon
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.foundation.lazy.items
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import coil.compose.AsyncImage
 import com.example.dineDelight.models.Meal
@@ -138,7 +139,8 @@ private fun RestaurantCard(
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .clickable(onClick = onRestaurantClick),
+            .clickable(onClick = onRestaurantClick)
+            .padding(vertical = 8.dp),
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
     ) {
         Row(
@@ -175,12 +177,13 @@ private fun RestaurantCard(
                 )
             }
 
-            // Restaurant image on the right side
+            // Restaurant image on the right side with border radius
             AsyncImage(
                 model = restaurant.imageUrl,
                 contentDescription = null,
                 modifier = Modifier
                     .size(100.dp) // Adjust size as needed
+                    .clip(MaterialTheme.shapes.medium) // Added border radius
                     .padding(start = 16.dp) // Add padding if necessary
             )
         }
