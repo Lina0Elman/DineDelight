@@ -1,5 +1,6 @@
 package com.example.dineDelight.pages
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -10,6 +11,8 @@ import androidx.navigation.NavController
 import androidx.compose.material3.IconButton
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import coil.compose.AsyncImage
+import com.example.dineDelight.models.Meal
 import com.example.dineDelight.models.Restaurant
 import com.example.dineDelight.models.RestaurantMenu
 import retrofit2.Retrofit
@@ -53,7 +56,7 @@ fun RestaurantDetailsScreen(navController: NavController, restaurant: Restaurant
             restaurantMenu?.let { menu ->
                 // Display the meals in the menu
                 menu.meals.forEach { meal ->
-                    Text(text = meal.strMeal) // Adjust this based on your RestaurantMenu structure
+                    MealCard(meal)
                 }
             } ?: Text(text = "No menu available.")
         }
@@ -73,4 +76,18 @@ private suspend fun fetchRestaurantMenu(restaurant: Restaurant): RestaurantMenu 
 interface MealService {
     @GET("filter.php")
     suspend fun getMealsByArea(@Query("a") area: String): RestaurantMenu
+}
+
+@Composable
+fun MealCard(meal: Meal) {
+    Card(
+        modifier = Modifier
+            .fillMaxWidth(),
+        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
+    ) {
+        Column(modifier = Modifier.padding(16.dp)) {
+            AsyncImage(model = meal.strMealThumb, contentDescription = null)
+            Text(text = meal.strMeal, style = MaterialTheme.typography.titleLarge)
+        }
+    }
 }

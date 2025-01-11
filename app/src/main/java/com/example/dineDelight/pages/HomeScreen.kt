@@ -187,21 +187,6 @@ private fun RestaurantCard(
     }
 }
 
-@Composable
-fun MealCard(meal: Meal, onMealClick: () -> Unit) {
-    Card(
-        modifier = Modifier
-            .fillMaxWidth()
-            .clickable(onClick = onMealClick),
-        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
-    ) {
-        Column(modifier = Modifier.padding(16.dp)) {
-            AsyncImage(model = meal.strMealThumb, contentDescription = null)
-            Text(text = meal.strMeal, style = MaterialTheme.typography.titleLarge)
-        }
-    }
-}
-
 private data class NavigationItem(
     val title: String,
     val icon: ImageVector
