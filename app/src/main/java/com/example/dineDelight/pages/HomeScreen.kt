@@ -1,6 +1,7 @@
 package com.example.dineDelight.pages
 
 import android.util.Log
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -178,14 +179,21 @@ private fun RestaurantCard(
             }
 
             // Restaurant image on the right side with border radius
-            AsyncImage(
-                model = restaurant.imageUrl,
-                contentDescription = null,
+            Box(
                 modifier = Modifier
-                    .size(100.dp) // Adjust size as needed
-                    .clip(MaterialTheme.shapes.medium) // Added border radius
-                    .padding(start = 16.dp) // Add padding if necessary
-            )
+                    .size(100.dp)
+                    .clip(MaterialTheme.shapes.medium)
+                    .background(MaterialTheme.colorScheme.surface)
+            ) {
+                AsyncImage(
+                    model = restaurant.imageUrl,
+                    contentDescription = null,
+                    contentScale = ContentScale.Crop,
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(start = 0.dp)
+                )
+            }
         }
     }
 }
