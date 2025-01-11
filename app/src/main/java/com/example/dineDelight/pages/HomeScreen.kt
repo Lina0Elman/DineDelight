@@ -12,6 +12,10 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.dineDelight.R
 import com.google.firebase.auth.FirebaseAuth
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.DateRange
+import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.filled.Person
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -57,8 +61,14 @@ fun HomeScreen(navController: NavController) {
                         },
                         icon = {
                             Icon(
-                                painter = painterResource(id = R.drawable.dining),
-                                contentDescription = item
+                                imageVector = when (item) {
+                                    "Home" -> Icons.Default.Home
+                                    "Reservations" -> Icons.Default.DateRange
+                                    "Profile" -> Icons.Default.Person
+                                    else -> Icons.Default.Home
+                                },
+                                contentDescription = item,
+                                modifier = Modifier.size(24.dp)
                             )
                         },
                         label = { Text(item) }
