@@ -12,7 +12,7 @@ object RestaurantRepository {
             availableSlots = listOf("18:00", "19:00", "20:00"),
             imageUrl = "https://t3.ftcdn.net/jpg/06/07/90/92/360_F_607909283_b3ysd6mRICNihTjLwCENgTwP08Zb4koz.jpg",
             area = "Italian",
-            description = "Eat the best pasta in town"
+            description = "Well known for our special tomato sauce"
         ),
         Restaurant(
             id = UUID.randomUUID(),
