@@ -141,34 +141,47 @@ private fun RestaurantCard(
             .clickable(onClick = onRestaurantClick),
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
     ) {
-        Column(modifier = Modifier.padding(16.dp)) {
-            // Restaurant image would go here
-            // AsyncImage(model = restaurant.imageUrl, contentDescription = null)
-            
-            Text(
-                text = restaurant.name,
-                style = MaterialTheme.typography.titleLarge
-            )
-            
-            Row(
-                modifier = Modifier.padding(vertical = 8.dp),
-                verticalAlignment = Alignment.CenterVertically
+        Row(
+            modifier = Modifier.padding(16.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Column(
+                modifier = Modifier.weight(1f)
             ) {
-                Icon(
-                    imageVector = Icons.Default.Star,
-                    contentDescription = "Rating",
-                    tint = MaterialTheme.colorScheme.primary
-                )
                 Text(
-                    text = restaurant.rating.toString(),
-                    style = MaterialTheme.typography.bodyMedium,
-                    modifier = Modifier.padding(start = 4.dp)
+                    text = restaurant.name,
+                    style = MaterialTheme.typography.titleLarge
+                )
+
+                Row(
+                    modifier = Modifier.padding(vertical = 8.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Star,
+                        contentDescription = "Rating",
+                        tint = MaterialTheme.colorScheme.primary
+                    )
+                    Text(
+                        text = restaurant.rating.toString(),
+                        style = MaterialTheme.typography.bodyMedium,
+                        modifier = Modifier.padding(start = 4.dp)
+                    )
+                }
+
+                Text(
+                    text = "Available slots: ${restaurant.availableSlots.joinToString(", ")}",
+                    style = MaterialTheme.typography.bodyMedium
                 )
             }
-            
-            Text(
-                text = "Available slots: ${restaurant.availableSlots.joinToString(", ")}",
-                style = MaterialTheme.typography.bodyMedium
+
+            // Restaurant image on the right side
+            AsyncImage(
+                model = restaurant.imageUrl,
+                contentDescription = null,
+                modifier = Modifier
+                    .size(100.dp) // Adjust size as needed
+                    .padding(start = 16.dp) // Add padding if necessary
             )
         }
     }
