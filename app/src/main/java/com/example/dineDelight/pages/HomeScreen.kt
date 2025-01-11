@@ -25,6 +25,9 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.foundation.lazy.items
 import androidx.compose.ui.layout.ContentScale
 import coil.compose.AsyncImage
+import com.example.dineDelight.models.Meal
+import com.example.dineDelight.models.Restaurant
+import com.example.dineDelight.repositories.RestaurantRepository
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -32,26 +35,7 @@ fun HomeScreen(navController: NavController) {
     val firebaseAuth = FirebaseAuth.getInstance()
     var currentUser by remember { mutableStateOf(firebaseAuth.currentUser) }
     var searchQuery by remember { mutableStateOf("") }
-    
-    // Mock restaurant data - In a real app, this would come from the REST API
-    val restaurants = remember {
-        listOf(
-            Restaurant(
-                id = "1",
-                name = "Italian Delight",
-                rating = 4.5f,
-                availableSlots = listOf("18:00", "19:00", "20:00"),
-                imageUrl = "https://example.com/italian.jpg"
-            ),
-            Restaurant(
-                id = "2",
-                name = "Sushi Paradise",
-                rating = 4.8f,
-                availableSlots = listOf("17:30", "18:30", "19:30"),
-                imageUrl = "https://example.com/sushi.jpg"
-            )
-        )
-    }
+    val restaurants = RestaurantRepository.getRestaurants()
 
     // Firebase Authentication state listener
     DisposableEffect(Unit) {
@@ -190,12 +174,6 @@ private fun RestaurantCard(
     }
 }
 
-data class Meal(
-    val strMeal: String,
-    val strMealThumb: String,
-    val idMeal: String
-)
-
 @Composable
 fun MealCard(meal: Meal, onMealClick: () -> Unit) {
     Card(
@@ -214,12 +192,4 @@ fun MealCard(meal: Meal, onMealClick: () -> Unit) {
 private data class NavigationItem(
     val title: String,
     val icon: ImageVector
-)
-
-private data class Restaurant(
-    val id: String,
-    val name: String,
-    val rating: Float,
-    val availableSlots: List<String>,
-    val imageUrl: String
 )
