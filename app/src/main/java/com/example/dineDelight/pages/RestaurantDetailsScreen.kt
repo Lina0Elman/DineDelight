@@ -88,9 +88,21 @@ fun MealCard(meal: Meal) {
             .fillMaxWidth(),
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
     ) {
-        Column(modifier = Modifier.padding(16.dp)) {
-            AsyncImage(model = meal.strMealThumb, contentDescription = null)
-            Text(text = meal.strMeal, style = MaterialTheme.typography.titleLarge)
+        Row(
+            modifier = Modifier.padding(16.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Column(
+                modifier = Modifier.weight(1f),
+                horizontalAlignment = Alignment.Start
+            ) {
+                Text(text = meal.strMeal, style = MaterialTheme.typography.titleLarge)
+            }
+            AsyncImage(
+                model = meal.strMealThumb,
+                contentDescription = null,
+                modifier = Modifier.size(100.dp)
+            )
         }
     }
 }
