@@ -1,16 +1,12 @@
 package com.example.dineDelight.pages
 
-import android.util.Log
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
-import com.example.dineDelight.R
 import com.google.firebase.auth.FirebaseAuth
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.DateRange
@@ -92,12 +88,12 @@ fun HomeScreen(navController: NavController) {
                 if (currentUser != null) {
                     // Show a personalized welcome message if the user is logged in
                     Text(
-                        text = "Welcome back, ${currentUser?.email ?: "User"}!",
+                        text = "Hello, ${currentUser?.email ?: "User"}!",
                         style = MaterialTheme.typography.bodyLarge
                     )
                     Spacer(modifier = Modifier.height(16.dp))
                     Button(onClick = { firebaseAuth.signOut() }) {
-                        Text("Sign Out")
+                        Text("Logout")
                     }
                 }
             }
