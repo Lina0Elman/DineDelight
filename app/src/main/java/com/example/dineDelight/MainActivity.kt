@@ -20,6 +20,7 @@ import com.example.dineDelight.pages.LoginScreen
 import com.example.dineDelight.pages.RegisterScreen
 import com.example.dineDelight.pages.RestaurantDetailsScreen
 import com.example.dineDelight.pages.ReservationScreen
+import com.example.dineDelight.pages.UserReservationsScreen
 import com.example.dineDelight.repositories.RestaurantRepository
 import com.example.dineDelight.ui.theme.MyApplicationTheme
 import com.google.firebase.FirebaseApp
@@ -73,14 +74,20 @@ class MainActivity : ComponentActivity() {
                             HomeScreen(navController)
                         }
 
+                        composable("user_reservations") {
+                            UserReservationsScreen(navController)
+                        }
+
                         // Set up navigation for each restaurant
                         restaurants.forEach { restaurant ->
                             composable("restaurant/${restaurant.id}") { 
                                 RestaurantDetailsScreen(navController, restaurant) 
                             }
 
-                            composable("reserve/${restaurant.id}") {
-                                ReservationScreen(navController, restaurant)
+                            composable("reserve/{restaurantId}") { backStackEntry ->
+                                val restaurantId = backStackEntry.arguments?.getString("restaurantId")
+                                val restaurant = RestaurantRepository.getRestaurants().find { it.id.toString() == restaurantId }
+                                restaurant?.let { ReservationScreen(navController, it) }
                             }
                         }
                     }

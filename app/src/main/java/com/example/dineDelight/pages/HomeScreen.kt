@@ -25,7 +25,9 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import coil.compose.AsyncImage
 import com.example.dineDelight.models.Meal
+import com.example.dineDelight.models.Reservation
 import com.example.dineDelight.models.Restaurant
+import com.example.dineDelight.repositories.ReservationRepository
 import com.example.dineDelight.repositories.RestaurantRepository
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -36,6 +38,12 @@ fun HomeScreen(navController: NavController) {
     var searchQuery by remember { mutableStateOf("") }
     val restaurants = RestaurantRepository.getRestaurants()
 
+    if (currentUser !== null) {
+        // Fetch reservations when the screen is launched
+        LaunchedEffect(currentUser?.uid) {
+            ReservationRepository.getUserReservations(currentUser!!.uid)
+        }
+    }
     // Firebase Authentication state listener
     DisposableEffect(Unit) {
         val authStateListener = FirebaseAuth.AuthStateListener { auth ->
@@ -67,7 +75,7 @@ fun HomeScreen(navController: NavController) {
             NavigationBar {
                 listOf(
                     NavigationItem("Home", Icons.Default.Home),
-                    NavigationItem("Reservations", Icons.Default.DateRange),
+                    NavigationItem("My Reservations", Icons.Default.DateRange),
                     NavigationItem("Profile", Icons.Default.Person)
                 ).forEach { item ->
                     NavigationBarItem(
@@ -78,7 +86,7 @@ fun HomeScreen(navController: NavController) {
                         onClick = {
                             when (item.title) {
                                 "Home" -> navController.navigate("home")
-                                "Reservations" -> navController.navigate("reservations")
+                                "My Reservations" -> navController.navigate("user_reservations")
                                 "Profile" -> navController.navigate("profile")
                             }
                         },
@@ -193,6 +201,20 @@ private fun RestaurantCard(
                         .padding(start = 0.dp)
                 )
             }
+        }
+    }
+}
+
+
+@Composable
+fun ReservationCard(reservation: Reservation) {
+    Card(
+        modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp),
+        elevation = CardDefaults.cardElevation(4.dp)
+    ) {
+        Column(modifier = Modifier.padding(16.dp)) {
+            Text(text = "Restaurant: ${reservation.restaurantName}", style = MaterialTheme.typography.bodyLarge)
+            Text(text = "Time: ${reservation.time}", style = MaterialTheme.typography.bodyMedium)
         }
     }
 }
