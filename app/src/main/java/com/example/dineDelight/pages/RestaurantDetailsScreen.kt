@@ -18,6 +18,7 @@ import coil.compose.AsyncImage
 import com.example.dineDelight.models.Meal
 import com.example.dineDelight.models.Restaurant
 import com.example.dineDelight.models.RestaurantMenu
+import com.example.dineDelight.utils.MealsApi
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.http.GET
@@ -83,7 +84,7 @@ fun RestaurantDetailsScreen(navController: NavController, restaurant: Restaurant
 
 private suspend fun fetchRestaurantMenu(restaurant: Restaurant): RestaurantMenu {
     val retrofit = Retrofit.Builder()
-        .baseUrl("https://www.themealdb.com/api/json/v1/1/")
+        .baseUrl(MealsApi.URL)
         .addConverterFactory(GsonConverterFactory.create())
         .build()
 
