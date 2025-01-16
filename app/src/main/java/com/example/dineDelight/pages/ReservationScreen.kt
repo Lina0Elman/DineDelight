@@ -24,6 +24,7 @@ import java.util.*
 @Composable
 fun ReservationScreen(navController: NavController, restaurant: Restaurant) {
     val userId = FirebaseAuth.getInstance().currentUser?.uid.orEmpty()
+    val userReservedSlots = ReservationRepository.getUserReservations(userId).filter { it.restaurantId == restaurant.id }.map { it.time }
     var selectedSlot by remember { mutableStateOf<String?>(null) }
     var showDialog by remember { mutableStateOf(false) }
 
@@ -36,21 +37,25 @@ fun ReservationScreen(navController: NavController, restaurant: Restaurant) {
             Icon(imageVector = Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
         }
 
-        Text(text = "Available Slots", style = MaterialTheme.typography.titleLarge)
+        Text(text = "Reserve at ${restaurant.name}", style = MaterialTheme.typography.titleLarge)
         Spacer(modifier = Modifier.height(16.dp))
 
         LazyColumn {
             items(restaurant.availableSlots) { slot ->
+                val isReserved = slot in userReservedSlots
                 Button(
                     onClick = {
-                        selectedSlot = slot
-                        showDialog = true
+                        if (!isReserved) {
+                            selectedSlot = slot
+                            showDialog = true
+                        }
                     },
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(vertical = 4.dp)
+                        .padding(vertical = 4.dp),
+                    enabled = !isReserved
                 ) {
-                    Text(text = "Reserve at $slot")
+                    Text(text = if (isReserved) "$slot (Reserved)" else "Reserve $slot")
                 }
             }
         }
@@ -60,20 +65,20 @@ fun ReservationScreen(navController: NavController, restaurant: Restaurant) {
         AlertDialog(
             onDismissRequest = { showDialog = false },
             title = { Text("Confirm Reservation") },
-            text = { Text("Are you sure you want to reserve for time $selectedSlot?") },
+            text = { Text("Are you sure you want to reserve the slot at $selectedSlot?") },
             confirmButton = {
                 TextButton(
                     onClick = {
-                        val reservation = Reservation(
+                        val newReservation = Reservation(
                             id = UUID.randomUUID(),
+                            userId = userId,
                             restaurantId = restaurant.id,
                             restaurantName = restaurant.name,
-                            time = selectedSlot!!,
-                            userId = userId
+                            time = selectedSlot!!
                         )
-                        ReservationRepository.addReservation(reservation)
+                        ReservationRepository.addReservation(newReservation)
                         showDialog = false
-                        navController.navigate("home")
+                        navController.popBackStack()
                     }
                 ) {
                     Text("Yes")
