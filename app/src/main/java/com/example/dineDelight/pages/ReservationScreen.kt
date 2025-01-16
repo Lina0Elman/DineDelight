@@ -41,17 +41,17 @@ fun ReservationScreen(navController: NavController, restaurant: Restaurant) {
 
         LazyColumn {
             items(restaurant.availableSlots) { slot ->
-                Text(
-                    text = slot,
+                Button(
+                    onClick = {
+                        selectedSlot = slot
+                        showDialog = true
+                    },
                     modifier = Modifier
                         .fillMaxWidth()
-                        .clickable {
-                            selectedSlot = slot
-                            showDialog = true
-                        }
-                        .padding(8.dp),
-                    style = MaterialTheme.typography.bodyLarge
-                )
+                        .padding(vertical = 4.dp)
+                ) {
+                    Text(text = "Reserve at $slot")
+                }
             }
         }
     }

@@ -32,7 +32,7 @@ fun UserReservationsScreen(navController: NavController) {
             Icon(imageVector = Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
         }
 
-        Text(text = "Your Reservations", style = MaterialTheme.typography.titleLarge)
+        Text(text = "My Reservations", style = MaterialTheme.typography.titleLarge)
         Spacer(modifier = Modifier.height(16.dp))
 
         LazyColumn {
