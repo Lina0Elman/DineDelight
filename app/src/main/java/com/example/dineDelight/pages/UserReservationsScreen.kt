@@ -17,11 +17,7 @@ import com.google.firebase.auth.FirebaseAuth
 @Composable
 fun UserReservationsScreen(navController: NavController) {
     val userId = FirebaseAuth.getInstance().currentUser?.uid.orEmpty()
-    val reservations by ReservationRepository.reservations.collectAsState()
-
-    LaunchedEffect(userId) {
-        ReservationRepository.getUserReservations(userId)
-    }
+    val reservations = ReservationRepository.getUserReservations(userId)
 
     Column(
         modifier = Modifier.fillMaxSize().padding(16.dp),

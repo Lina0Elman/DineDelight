@@ -24,7 +24,8 @@ import java.util.*
 @Composable
 fun ReservationScreen(navController: NavController, restaurant: Restaurant) {
     val userId = FirebaseAuth.getInstance().currentUser?.uid.orEmpty()
-    val userReservedSlots = ReservationRepository.getUserReservations(userId).filter { it.restaurantId == restaurant.id }.map { it.time }
+    val allReservations by ReservationRepository.reservations.collectAsState()
+    val reservedSlots = allReservations.filter { it.restaurantId == restaurant.id }.map { it.time }
     var selectedSlot by remember { mutableStateOf<String?>(null) }
     var showDialog by remember { mutableStateOf(false) }
 
@@ -42,7 +43,7 @@ fun ReservationScreen(navController: NavController, restaurant: Restaurant) {
 
         LazyColumn {
             items(restaurant.availableSlots) { slot ->
-                val isReserved = slot in userReservedSlots
+                val isReserved = slot in reservedSlots
                 Button(
                     onClick = {
                         if (!isReserved) {
