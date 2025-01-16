@@ -79,7 +79,7 @@ fun ReservationScreen(navController: NavController, restaurant: Restaurant) {
                         )
                         ReservationRepository.addReservation(newReservation)
                         showDialog = false
-                        navController.popBackStack()
+                        navController.navigate("home")
                     }
                 ) {
                     Text("Yes")
