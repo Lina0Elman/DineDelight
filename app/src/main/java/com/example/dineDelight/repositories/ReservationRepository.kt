@@ -26,4 +26,17 @@ object ReservationRepository {
     fun getUserReservations(userId: String): List<Reservation> {
         return _reservations.value.filter { it.userId == userId }
     }
+
+    fun getReservationById(reservationId: UUID): Reservation? {
+        return _reservations.value.find { it.id == reservationId }
+    }
+
+
+    fun getAvailableSlotsExcludingUserReservations(userId: String, restaurantId: UUID): StateFlow<List<String>> {
+        val userReservations = getUserReservations(userId).filter { it.restaurantId == restaurantId }.map { it.time }
+        val restaurant = RestaurantRepository.getRestaurants().find { it.id == restaurantId }
+        val availableSlots = restaurant?.availableSlots ?: emptyList()
+        val filteredSlots = availableSlots.filterNot { it in userReservations }
+        return MutableStateFlow(filteredSlots)
+    }
 }

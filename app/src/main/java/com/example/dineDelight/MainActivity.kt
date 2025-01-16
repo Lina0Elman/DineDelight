@@ -20,11 +20,14 @@ import com.example.dineDelight.pages.LoginScreen
 import com.example.dineDelight.pages.RegisterScreen
 import com.example.dineDelight.pages.RestaurantDetailsScreen
 import com.example.dineDelight.pages.ReservationScreen
+import com.example.dineDelight.pages.UpdateReservationScreen
 import com.example.dineDelight.pages.UserReservationsScreen
 import com.example.dineDelight.repositories.RestaurantRepository
 import com.example.dineDelight.ui.theme.MyApplicationTheme
 import com.google.firebase.FirebaseApp
+import java.util.UUID
 import com.google.firebase.auth.FirebaseAuth
+
 
 class MainActivity : ComponentActivity() {
     private lateinit var auth: FirebaseAuth
@@ -76,6 +79,11 @@ class MainActivity : ComponentActivity() {
 
                         composable("user_reservations") {
                             UserReservationsScreen(navController)
+                        }
+
+                        composable("update_reservation/{reservationId}") { backStackEntry ->
+                            val reservationId = UUID.fromString(backStackEntry.arguments?.getString("reservationId"))
+                            UpdateReservationScreen(navController, reservationId)
                         }
 
                         // Set up navigation for each restaurant

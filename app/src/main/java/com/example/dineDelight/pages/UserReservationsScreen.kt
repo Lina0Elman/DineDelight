@@ -37,16 +37,22 @@ fun UserReservationsScreen(navController: NavController) {
 
         LazyColumn {
             items(reservations) { reservation ->
-                ReservationCard(reservation, onDelete = {
+                ReservationCard(reservation,
+                    onDelete = {
                     ReservationRepository.deleteReservation(reservation.id)
+                }, onUpdate = {
+                    navController.navigate("update_reservation/${reservation.id}")
                 })
             }
         }
     }
 }
 
+
+
+
 @Composable
-fun ReservationCard(reservation: Reservation, onDelete: () -> Unit) {
+fun ReservationCard(reservation: Reservation, onDelete: () -> Unit, onUpdate: () -> Unit) {
     Card(
         modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp),
         elevation = CardDefaults.cardElevation(4.dp)
@@ -55,6 +61,9 @@ fun ReservationCard(reservation: Reservation, onDelete: () -> Unit) {
             Text(text = "Restaurant: ${reservation.restaurantName}", style = MaterialTheme.typography.bodyLarge)
             Text(text = "Time: ${reservation.time}", style = MaterialTheme.typography.bodyMedium)
             Row {
+                Button(onClick = onUpdate) {
+                    Text("Update")
+                }
                 Spacer(modifier = Modifier.width(8.dp))
                 Button(onClick = onDelete) {
                     Text("Delete")
