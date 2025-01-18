@@ -7,7 +7,7 @@ data class Review(
     @DocumentId val id: String = UUID.randomUUID().toString(), // Firestore Document ID
     val userId: String = "",
     val userEmail: String = "",
-    val restaurantId: String = "",
+    val restaurantId: Int = 0,
     val restaurantName: String = "",
     val text: String = ""
 )

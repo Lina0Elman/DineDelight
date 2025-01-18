@@ -123,7 +123,7 @@ fun RestaurantDetailsScreen(navController: NavController, restaurant: Restaurant
                     val review = Review(
                         userId = userId,
                         userEmail = userEmail,
-                        restaurantId = restaurant.id.toString(),
+                        restaurantId = restaurant.id,
                         restaurantName = restaurant.name,
                         text = reviewText
                     )
