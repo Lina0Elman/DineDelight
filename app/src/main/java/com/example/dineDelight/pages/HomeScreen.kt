@@ -20,9 +20,16 @@ import androidx.compose.ui.layout.ContentScale
 import coil.compose.AsyncImage
 import com.example.dineDelight.models.Reservation
 import com.example.dineDelight.models.Restaurant
+import com.example.dineDelight.models.Review
 import com.example.dineDelight.repositories.ReservationRepository
 import com.example.dineDelight.repositories.RestaurantRepository
+import com.example.dineDelight.repositories.ReviewRepository
+import com.example.dineDelight.repositories.ReviewRepository.addReview
 import com.example.dineDelight.views.BottomNavigationBar
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import java.util.UUID
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -108,78 +115,88 @@ private fun RestaurantCard(
     restaurant: Restaurant,
     onRestaurantClick: () -> Unit
 ) {
+    var showReviewDialog by remember { mutableStateOf(false) }
+    var reviewText by remember { mutableStateOf("") }
+    val userId = FirebaseAuth.getInstance().currentUser?.uid.orEmpty()
+    val userName = FirebaseAuth.getInstance().currentUser?.email.orEmpty()
+
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = 16.dp)
-            .clickable(onClick = onRestaurantClick)
-            .padding(vertical = 8.dp),
+            .padding(horizontal = 16.dp, vertical = 8.dp)
+            .clickable(onClick = onRestaurantClick),
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
     ) {
-        Row(
+        Column(
             modifier = Modifier.padding(16.dp),
-            verticalAlignment = Alignment.CenterVertically
+            verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
-            Column(
-                modifier = Modifier.weight(1f)
-            ) {
-                Text(
-                    text = restaurant.name,
-                    style = MaterialTheme.typography.titleLarge
-                )
-
-                Row(
-                    modifier = Modifier.padding(vertical = 8.dp),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.Star,
-                        contentDescription = "Rating",
-                        tint = MaterialTheme.colorScheme.primary
-                    )
-                    Text(
-                        text = restaurant.rating.toString(),
-                        style = MaterialTheme.typography.bodyMedium,
-                        modifier = Modifier.padding(start = 4.dp)
-                    )
-                }
-
-                Text(
-                    text = "Available slots: ${restaurant.availableSlots.joinToString(", ")}",
-                    style = MaterialTheme.typography.bodyMedium
-                )
-            }
-
-            // Restaurant image on the right side with border radius
-            Box(
+            Text(
+                text = restaurant.name,
+                style = MaterialTheme.typography.titleLarge
+            )
+            Text(
+                text = restaurant.description,
+                style = MaterialTheme.typography.bodyMedium
+            )
+            Text(
+                text = "Rating: ${restaurant.rating}",
+                style = MaterialTheme.typography.bodySmall
+            )
+            AsyncImage(
+                model = restaurant.imageUrl,
+                contentDescription = null,
                 modifier = Modifier
-                    .size(100.dp)
-                    .clip(MaterialTheme.shapes.medium)
-                    .background(MaterialTheme.colorScheme.surface)
+                    .fillMaxWidth()
+                    .height(150.dp)
+                    .clip(MaterialTheme.shapes.medium),
+                contentScale = ContentScale.Crop
+            )
+            TextButton(
+                onClick = { showReviewDialog = true },
+                modifier = Modifier.align(Alignment.End)
             ) {
-                AsyncImage(
-                    model = restaurant.imageUrl,
-                    contentDescription = null,
-                    contentScale = ContentScale.Crop,
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(start = 0.dp)
+                Icon(imageVector = Icons.Default.Star, contentDescription = "Leave a Review")
+                Spacer(modifier = Modifier.width(4.dp))
+                Text("Review")
+            }
+
+            if (showReviewDialog) {
+                AlertDialog(
+                    onDismissRequest = { showReviewDialog = false },
+                    title = { Text("Leave a Review") },
+                    text = {
+                        TextField(
+                            value = reviewText,
+                            onValueChange = { reviewText = it },
+                            label = { Text("Your Review") }
+                        )
+                    },
+                    confirmButton = {
+                        Button(onClick = {
+                            val review = Review(
+                                id = UUID.randomUUID(),
+                                userId = userId,
+                                userName = userName,
+                                restaurantId = restaurant.id,
+                                restaurantName = restaurant.name,
+                                text = reviewText
+                            )
+                            CoroutineScope(Dispatchers.IO).launch {
+                                ReviewRepository.addReview(review)
+                            }
+                            showReviewDialog = false
+                        }) {
+                            Text("Submit")
+                        }
+                    },
+                    dismissButton = {
+                        Button(onClick = { showReviewDialog = false }) {
+                            Text("Cancel")
+                        }
+                    }
                 )
             }
-        }
-    }
-}
-
-
-@Composable
-fun ReservationCard(reservation: Reservation) {
-    Card(
-        modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp),
-        elevation = CardDefaults.cardElevation(4.dp)
-    ) {
-        Column(modifier = Modifier.padding(16.dp)) {
-            Text(text = "Restaurant: ${reservation.restaurantName}", style = MaterialTheme.typography.bodyLarge)
-            Text(text = "Time: ${reservation.time}", style = MaterialTheme.typography.bodyMedium)
         }
     }
 }

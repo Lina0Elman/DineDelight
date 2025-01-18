@@ -4,6 +4,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
@@ -24,6 +25,7 @@ fun BottomNavigationBar(navController: NavController, selectedItem: String) {
         listOf(
             NavigationItem("Home", Icons.Default.Home),
             NavigationItem("My Reservations", Icons.Default.DateRange),
+            NavigationItem("My Reviews", Icons.Default.Edit),
             NavigationItem("Profile", Icons.Default.Person)
         ).forEach { item ->
             NavigationBarItem(
@@ -33,6 +35,7 @@ fun BottomNavigationBar(navController: NavController, selectedItem: String) {
                         "Home" -> navController.navigate("home")
                         "My Reservations" -> navController.navigate("user_reservations")
                         "Profile" -> navController.navigate("profile")
+                        "My Reviews" -> navController.navigate("my_reviews")
                     }
                 },
                 icon = { Icon(item.icon, item.title) },

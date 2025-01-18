@@ -27,6 +27,7 @@ import com.example.dineDelight.ui.theme.MyApplicationTheme
 import com.google.firebase.FirebaseApp
 import java.util.UUID
 import com.google.firebase.auth.FirebaseAuth
+import com.example.dineDelight.pages.UserReviewsScreen
 
 
 class MainActivity : ComponentActivity() {
@@ -75,6 +76,10 @@ class MainActivity : ComponentActivity() {
 
                         composable("home") {
                             HomeScreen(navController)
+                        }
+
+                        composable("my_reviews") {
+                            UserReviewsScreen(navController)
                         }
 
                         composable("user_reservations") {
