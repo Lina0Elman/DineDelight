@@ -34,10 +34,6 @@ import retrofit2.http.Query
 fun RestaurantDetailsScreen(navController: NavController, restaurant: Restaurant) {
     var restaurantMenu by remember { mutableStateOf<RestaurantMenu?>(null) }
     var loading by remember { mutableStateOf(true) }
-    var showReviewDialog by remember { mutableStateOf(false) }
-    var reviewText by remember { mutableStateOf("") }
-    val userId = FirebaseAuth.getInstance().currentUser?.uid.orEmpty()
-    val userEmail = FirebaseAuth.getInstance().currentUser?.email.orEmpty()
 
     LaunchedEffect(restaurant) {
         loading = true
@@ -74,12 +70,12 @@ fun RestaurantDetailsScreen(navController: NavController, restaurant: Restaurant
             Spacer(modifier = Modifier.height(8.dp))
 
             Button(
-                onClick = { showReviewDialog = true },
+                onClick = { navController.navigate("restaurant_reviews/${restaurant.id}") },
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Icon(imageVector = Icons.Default.Star, contentDescription = "Leave a Review")
                 Spacer(modifier = Modifier.width(8.dp))
-                Text("Leave a Review")
+                Text("View/Leave a Review")
             }
 
             Spacer(modifier = Modifier.height(16.dp))
@@ -97,56 +93,11 @@ fun RestaurantDetailsScreen(navController: NavController, restaurant: Restaurant
             }
         } else {
             restaurantMenu?.let { menu ->
-                items(menu.meals) { meal ->
-                    MealCard(meal)
-                }
+                items(menu.meals) { meal -> MealCard(meal) }
             } ?: item {
                 Text(text = "No menu available.")
             }
         }
-    }
-
-    // Review Dialog
-    if (showReviewDialog) {
-        AlertDialog(
-            onDismissRequest = { showReviewDialog = false },
-            title = { Text("Leave a Review") },
-            text = {
-                TextField(
-                    value = reviewText,
-                    onValueChange = { reviewText = it },
-                    label = { Text("Your Review") }
-                )
-            },
-            confirmButton = {
-                Button(onClick = {
-                    val review = Review(
-                        userId = userId,
-                        userEmail = userEmail,
-                        restaurantId = restaurant.id,
-                        restaurantName = restaurant.name,
-                        text = reviewText
-                    )
-                    CoroutineScope(Dispatchers.IO).launch {
-                        try {
-                            ReviewRepository.addReview(review)
-                            showReviewDialog = false
-                            reviewText = "" // Reset review text on successful submission
-                        } catch (e: Exception) {
-                            // Log the error or show a toast message for the failure
-                            e.printStackTrace()
-                        }
-                    }
-                }) {
-                    Text("Submit")
-                }
-            },
-            dismissButton = {
-                Button(onClick = { showReviewDialog = false }) {
-                    Text("Cancel")
-                }
-            }
-        )
     }
 }
 

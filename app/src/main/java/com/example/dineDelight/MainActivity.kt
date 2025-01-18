@@ -20,6 +20,7 @@ import com.example.dineDelight.pages.LoginScreen
 import com.example.dineDelight.pages.RegisterScreen
 import com.example.dineDelight.pages.RestaurantDetailsScreen
 import com.example.dineDelight.pages.ReservationScreen
+import com.example.dineDelight.pages.RestaurantReviewsScreen
 import com.example.dineDelight.pages.UpdateReservationScreen
 import com.example.dineDelight.pages.UpdateReviewScreen
 import com.example.dineDelight.pages.UserReservationsScreen
@@ -107,6 +108,10 @@ class MainActivity : ComponentActivity() {
                                 val restaurantId = backStackEntry.arguments?.getString("restaurantId")
                                 val restaurant = RestaurantRepository.getRestaurants().find { it.id.toString() == restaurantId }
                                 restaurant?.let { ReservationScreen(navController, it) }
+                            }
+
+                            composable("restaurant_reviews/${restaurant.id}") {
+                                RestaurantReviewsScreen(navController, restaurant)
                             }
                         }
                     }

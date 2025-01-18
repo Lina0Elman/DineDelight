@@ -22,7 +22,7 @@ object ReviewRepository {
             .toObjects(Review::class.java)
     }
 
-    suspend fun getRestaurantReviews(restaurantId: String): List<Review> {
+    suspend fun getRestaurantReviews(restaurantId: Int): List<Review> {
         return reviewsCollection
             .whereEqualTo("restaurantId", restaurantId)
             .get()
