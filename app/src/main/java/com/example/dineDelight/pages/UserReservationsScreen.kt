@@ -3,42 +3,59 @@ package com.example.dineDelight.pages
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.dineDelight.models.Reservation
 import com.example.dineDelight.repositories.ReservationRepository
+import com.example.dineDelight.views.BottomNavigationBar
 import com.google.firebase.auth.FirebaseAuth
 
+
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun UserReservationsScreen(navController: NavController) {
     val userId = FirebaseAuth.getInstance().currentUser?.uid.orEmpty()
-    val reservations = ReservationRepository.getUserReservations(userId)
+    var reservations by remember { mutableStateOf(ReservationRepository.getUserReservations(userId)) }
 
-    Column(
-        modifier = Modifier.fillMaxSize().padding(16.dp),
-        verticalArrangement = Arrangement.Top
-    ) {
-        // Back button
-        IconButton(onClick = { navController.popBackStack() }) {
-            Icon(imageVector = Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
-        }
 
-        Text(text = "My Reservations", style = MaterialTheme.typography.titleLarge)
-        Spacer(modifier = Modifier.height(16.dp))
-
-        LazyColumn {
-            items(reservations) { reservation ->
-                ReservationCard(reservation,
-                    onDelete = {
-                    ReservationRepository.deleteReservation(reservation.id)
-                }, onUpdate = {
-                    navController.navigate("update_reservation/${reservation.id}")
-                })
+    Scaffold(
+        topBar = {
+            SmallTopAppBar(
+                title = { Text("My Reservations") },
+                colors = TopAppBarDefaults.smallTopAppBarColors(
+                    containerColor = MaterialTheme.colorScheme.primary,
+                    titleContentColor = MaterialTheme.colorScheme.onPrimary
+                )
+            )
+        },
+        bottomBar = { BottomNavigationBar(navController, "My Reservations") }
+    ) { padding ->
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(padding)
+                .padding(16.dp),
+            verticalArrangement = Arrangement.Top,
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            if (reservations.isEmpty()) {
+                Text(text = "You have no reservations yet", style = MaterialTheme.typography.bodyLarge)
+            } else {
+                LazyColumn {
+                    items(reservations) { reservation ->
+                        ReservationCard(reservation,
+                            onDelete = {
+                                ReservationRepository.deleteReservation(reservation.id)
+                                reservations = ReservationRepository.getUserReservations(userId)
+                            }, onUpdate = {
+                                navController.navigate("update_reservation/${reservation.id}")
+                            })
+                    }
+                }
             }
         }
     }

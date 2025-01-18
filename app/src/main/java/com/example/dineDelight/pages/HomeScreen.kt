@@ -1,6 +1,5 @@
 package com.example.dineDelight.pages
 
-import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -13,22 +12,18 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.google.firebase.auth.FirebaseAuth
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.DateRange
-import androidx.compose.material.icons.filled.Home
-import androidx.compose.material.icons.filled.Person
-import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.Icon
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.foundation.lazy.items
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import coil.compose.AsyncImage
-import com.example.dineDelight.models.Meal
 import com.example.dineDelight.models.Reservation
 import com.example.dineDelight.models.Restaurant
 import com.example.dineDelight.repositories.ReservationRepository
 import com.example.dineDelight.repositories.RestaurantRepository
+import com.example.dineDelight.views.BottomNavigationBar
+
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -39,17 +34,14 @@ fun HomeScreen(navController: NavController) {
     val restaurants = RestaurantRepository.getRestaurants()
 
     if (currentUser !== null) {
-        // Fetch reservations when the screen is launched
         LaunchedEffect(currentUser?.uid) {
             ReservationRepository.getUserReservations(currentUser!!.uid)
         }
     }
-    // Firebase Authentication state listener
     DisposableEffect(Unit) {
         val authStateListener = FirebaseAuth.AuthStateListener { auth ->
             currentUser = auth.currentUser
             if (auth.currentUser == null) {
-                // Navigate back to login when user logs out
                 navController.navigate("login") {
                     popUpTo("home") { inclusive = true }
                 }
@@ -71,31 +63,7 @@ fun HomeScreen(navController: NavController) {
                 )
             )
         },
-        bottomBar = {
-            NavigationBar {
-                listOf(
-                    NavigationItem("Home", Icons.Default.Home),
-                    NavigationItem("My Reservations", Icons.Default.DateRange),
-                    NavigationItem("Profile", Icons.Default.Person)
-                ).forEach { item ->
-                    NavigationBarItem(
-                        selected = when (item.title) {
-                            "Home" -> true
-                            else -> false
-                        },
-                        onClick = {
-                            when (item.title) {
-                                "Home" -> navController.navigate("home")
-                                "My Reservations" -> navController.navigate("user_reservations")
-                                "Profile" -> navController.navigate("profile")
-                            }
-                        },
-                        icon = { Icon(item.icon, item.title) },
-                        label = { Text(item.title) }
-                    )
-                }
-            }
-        }
+        bottomBar = { BottomNavigationBar(navController, "Home") }
     ) { padding ->
         Box(
             modifier = Modifier
@@ -105,7 +73,6 @@ fun HomeScreen(navController: NavController) {
         ) {
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
                 if (currentUser != null) {
-                    // Show a personalized welcome message if the user is logged in
                     Text(
                         text = "Hello, ${currentUser?.email ?: "User"}!",
                         style = MaterialTheme.typography.bodyLarge
@@ -116,7 +83,6 @@ fun HomeScreen(navController: NavController) {
                     }
                 }
 
-                // Search input field
                 TextField(
                     value = searchQuery,
                     onValueChange = { searchQuery = it },
@@ -124,11 +90,9 @@ fun HomeScreen(navController: NavController) {
                     modifier = Modifier.fillMaxWidth().padding(16.dp)
                 )
 
-                // Restaurant cards
                 LazyColumn {
                     items(restaurants.filter { it.name.contains(searchQuery, ignoreCase = true) }) { restaurant ->
                         RestaurantCard(restaurant) {
-                            // Navigate to RestaurantDetails with the restaurantId
                             navController.navigate("restaurant/${restaurant.id}")
                         }
                     }
@@ -137,6 +101,7 @@ fun HomeScreen(navController: NavController) {
         }
     }
 }
+
 
 @Composable
 private fun RestaurantCard(
@@ -218,8 +183,3 @@ fun ReservationCard(reservation: Reservation) {
         }
     }
 }
-
-private data class NavigationItem(
-    val title: String,
-    val icon: ImageVector
-)
