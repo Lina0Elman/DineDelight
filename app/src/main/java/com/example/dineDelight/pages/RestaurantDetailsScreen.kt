@@ -47,62 +47,68 @@ fun RestaurantDetailsScreen(navController: NavController, restaurant: Restaurant
         loading = false
     }
 
-    Column(
+    LazyColumn(
         modifier = Modifier
             .fillMaxSize()
             .padding(16.dp),
         verticalArrangement = Arrangement.Top,
         horizontalAlignment = Alignment.Start
     ) {
-        IconButton(onClick = { navController.popBackStack() }) {
-            Icon(imageVector = Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
-        }
+        item {
+            // Top Section: Restaurant Details
+            IconButton(onClick = { navController.popBackStack() }) {
+                Icon(imageVector = Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
+            }
 
-        Text(text = "Restaurant Details", style = MaterialTheme.typography.titleLarge)
-        Spacer(modifier = Modifier.height(16.dp))
-        Text(text = "Restaurant Name: ${restaurant.name}")
-        Text(text = "Description: ${restaurant.description}")
-        Spacer(modifier = Modifier.height(8.dp))
+            Text(text = "Restaurant Details", style = MaterialTheme.typography.titleLarge)
+            Spacer(modifier = Modifier.height(16.dp))
+            Text(text = "Restaurant Name: ${restaurant.name}")
+            Text(text = "Description: ${restaurant.description}")
+            Spacer(modifier = Modifier.height(8.dp))
 
-        Button(
-            onClick = { navController.navigate("reserve/${restaurant.id}") },
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            Text(text = "Reserve a Slot")
-        }
-
-        Spacer(modifier = Modifier.height(8.dp))
-
-        // Review Button
-        Button(
-            onClick = { showReviewDialog = true },
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            Icon(imageVector = Icons.Default.Star, contentDescription = "Leave a Review")
-            Spacer(modifier = Modifier.width(8.dp))
-            Text("Leave a Review")
-        }
-
-        Spacer(modifier = Modifier.height(8.dp))
-
-        if (loading) {
-            Box(
-                modifier = Modifier.fillMaxSize(),
-                contentAlignment = Alignment.Center
+            Button(
+                onClick = { navController.navigate("reserve/${restaurant.id}") },
+                modifier = Modifier.fillMaxWidth()
             ) {
-                CircularProgressIndicator()
+                Text(text = "Reserve a Slot")
+            }
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            Button(
+                onClick = { showReviewDialog = true },
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Icon(imageVector = Icons.Default.Star, contentDescription = "Leave a Review")
+                Spacer(modifier = Modifier.width(8.dp))
+                Text("Leave a Review")
+            }
+
+            Spacer(modifier = Modifier.height(16.dp))
+        }
+
+        // Loading or Menu Content Section
+        if (loading) {
+            item {
+                Box(
+                    modifier = Modifier.fillMaxSize(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    CircularProgressIndicator()
+                }
             }
         } else {
             restaurantMenu?.let { menu ->
-                LazyColumn {
-                    items(menu.meals) { meal ->
-                        MealCard(meal)
-                    }
+                items(menu.meals) { meal ->
+                    MealCard(meal)
                 }
-            } ?: Text(text = "No menu available.")
+            } ?: item {
+                Text(text = "No menu available.")
+            }
         }
     }
 
+    // Review Dialog
     if (showReviewDialog) {
         AlertDialog(
             onDismissRequest = { showReviewDialog = false },
