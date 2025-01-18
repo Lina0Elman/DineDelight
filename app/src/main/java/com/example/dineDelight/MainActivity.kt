@@ -21,6 +21,7 @@ import com.example.dineDelight.pages.RegisterScreen
 import com.example.dineDelight.pages.RestaurantDetailsScreen
 import com.example.dineDelight.pages.ReservationScreen
 import com.example.dineDelight.pages.UpdateReservationScreen
+import com.example.dineDelight.pages.UpdateReviewScreen
 import com.example.dineDelight.pages.UserReservationsScreen
 import com.example.dineDelight.repositories.RestaurantRepository
 import com.example.dineDelight.ui.theme.MyApplicationTheme
@@ -89,6 +90,11 @@ class MainActivity : ComponentActivity() {
                         composable("update_reservation/{reservationId}") { backStackEntry ->
                             val reservationId = UUID.fromString(backStackEntry.arguments?.getString("reservationId"))
                             UpdateReservationScreen(navController, reservationId)
+                        }
+
+                        composable("update_review/{reviewId}") { backStackEntry ->
+                            val reviewId = UUID.fromString(backStackEntry.arguments?.getString("reviewId"))
+                            UpdateReviewScreen(navController, reviewId.toString())
                         }
 
                         // Set up navigation for each restaurant
