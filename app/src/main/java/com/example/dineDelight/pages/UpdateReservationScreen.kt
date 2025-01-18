@@ -35,7 +35,9 @@ import java.util.UUID
 fun UpdateReservationScreen(navController: NavController, reservationId: UUID) {
     val userId = FirebaseAuth.getInstance().currentUser?.uid.orEmpty()
     val reservation = ReservationRepository.getReservationById(reservationId)
-    val availableSlots by ReservationRepository.getAvailableSlotsExcludingUserReservations(userId, reservation?.restaurantId ?: UUID.randomUUID()).collectAsState(initial = emptyList())
+    val availableSlots by ReservationRepository.getAvailableSlotsExcludingUserReservations(
+        userId, reservation!!.restaurantId)
+        .collectAsState(initial = emptyList())
     var selectedSlot by remember { mutableStateOf<String?>(reservation?.time) }
     var showDialog by remember { mutableStateOf(false) }
 

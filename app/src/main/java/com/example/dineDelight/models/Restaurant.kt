@@ -3,7 +3,7 @@ package com.example.dineDelight.models
 import java.util.UUID
 
 data class Restaurant(
-    val id: UUID,
+    val id: Int,
     val name: String,
     val description: String,
     val area: String,
