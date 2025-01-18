@@ -74,14 +74,16 @@ fun RestaurantDetailsScreen(navController: NavController, restaurant: Restaurant
         Spacer(modifier = Modifier.height(8.dp))
 
         // Review Button
-        TextButton(
+        Button(
             onClick = { showReviewDialog = true },
-            modifier = Modifier.align(Alignment.End)
+            modifier = Modifier.fillMaxWidth()
         ) {
             Icon(imageVector = Icons.Default.Star, contentDescription = "Leave a Review")
-            Spacer(modifier = Modifier.width(4.dp))
-            Text("Review")
+            Spacer(modifier = Modifier.width(8.dp))
+            Text("Leave a Review")
         }
+
+        Spacer(modifier = Modifier.height(8.dp))
 
         if (loading) {
             Box(
