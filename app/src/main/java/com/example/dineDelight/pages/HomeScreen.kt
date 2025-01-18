@@ -115,11 +115,6 @@ private fun RestaurantCard(
     restaurant: Restaurant,
     onRestaurantClick: () -> Unit
 ) {
-    var showReviewDialog by remember { mutableStateOf(false) }
-    var reviewText by remember { mutableStateOf("") }
-    val userId = FirebaseAuth.getInstance().currentUser?.uid.orEmpty()
-    val userName = FirebaseAuth.getInstance().currentUser?.email.orEmpty()
-
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -152,51 +147,6 @@ private fun RestaurantCard(
                     .clip(MaterialTheme.shapes.medium),
                 contentScale = ContentScale.Crop
             )
-            TextButton(
-                onClick = { showReviewDialog = true },
-                modifier = Modifier.align(Alignment.End)
-            ) {
-                Icon(imageVector = Icons.Default.Star, contentDescription = "Leave a Review")
-                Spacer(modifier = Modifier.width(4.dp))
-                Text("Review")
-            }
-
-            if (showReviewDialog) {
-                AlertDialog(
-                    onDismissRequest = { showReviewDialog = false },
-                    title = { Text("Leave a Review") },
-                    text = {
-                        TextField(
-                            value = reviewText,
-                            onValueChange = { reviewText = it },
-                            label = { Text("Your Review") }
-                        )
-                    },
-                    confirmButton = {
-                        Button(onClick = {
-                            val review = Review(
-                                id = UUID.randomUUID(),
-                                userId = userId,
-                                userName = userName,
-                                restaurantId = restaurant.id,
-                                restaurantName = restaurant.name,
-                                text = reviewText
-                            )
-                            CoroutineScope(Dispatchers.IO).launch {
-                                ReviewRepository.addReview(review)
-                            }
-                            showReviewDialog = false
-                        }) {
-                            Text("Submit")
-                        }
-                    },
-                    dismissButton = {
-                        Button(onClick = { showReviewDialog = false }) {
-                            Text("Cancel")
-                        }
-                    }
-                )
-            }
         }
     }
 }

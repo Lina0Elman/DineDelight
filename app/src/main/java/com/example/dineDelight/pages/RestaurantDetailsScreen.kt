@@ -13,23 +13,34 @@ import androidx.navigation.NavController
 import androidx.compose.material3.IconButton
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.Star
 import androidx.compose.ui.draw.clip
 import coil.compose.AsyncImage
 import com.example.dineDelight.models.Meal
 import com.example.dineDelight.models.Restaurant
 import com.example.dineDelight.models.RestaurantMenu
+import com.example.dineDelight.models.Review
+import com.example.dineDelight.repositories.ReviewRepository
 import com.example.dineDelight.utils.MealsApi
+import com.google.firebase.auth.FirebaseAuth
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.http.GET
 import retrofit2.http.Query
+import java.util.UUID
 
 @Composable
 fun RestaurantDetailsScreen(navController: NavController, restaurant: Restaurant) {
     var restaurantMenu by remember { mutableStateOf<RestaurantMenu?>(null) }
     var loading by remember { mutableStateOf(true) }
+    var showReviewDialog by remember { mutableStateOf(false) }
+    var reviewText by remember { mutableStateOf("") }
+    val userId = FirebaseAuth.getInstance().currentUser?.uid.orEmpty()
+    val userName = FirebaseAuth.getInstance().currentUser?.email.orEmpty()
 
-    // Use LaunchedEffect to perform the network call
     LaunchedEffect(restaurant) {
         loading = true
         restaurantMenu = fetchRestaurantMenu(restaurant)
@@ -43,7 +54,6 @@ fun RestaurantDetailsScreen(navController: NavController, restaurant: Restaurant
         verticalArrangement = Arrangement.Top,
         horizontalAlignment = Alignment.Start
     ) {
-        // Back button
         IconButton(onClick = { navController.popBackStack() }) {
             Icon(imageVector = Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
         }
@@ -55,13 +65,23 @@ fun RestaurantDetailsScreen(navController: NavController, restaurant: Restaurant
         Spacer(modifier = Modifier.height(8.dp))
 
         Button(
-            onClick = { navController.navigate("reserve/${restaurant.id}") }, // Navigate to reservation screen
+            onClick = { navController.navigate("reserve/${restaurant.id}") },
             modifier = Modifier.fillMaxWidth()
         ) {
             Text(text = "Reserve a Slot")
         }
 
         Spacer(modifier = Modifier.height(8.dp))
+
+        // Review Button
+        TextButton(
+            onClick = { showReviewDialog = true },
+            modifier = Modifier.align(Alignment.End)
+        ) {
+            Icon(imageVector = Icons.Default.Star, contentDescription = "Leave a Review")
+            Spacer(modifier = Modifier.width(4.dp))
+            Text("Review")
+        }
 
         if (loading) {
             Box(
@@ -79,6 +99,43 @@ fun RestaurantDetailsScreen(navController: NavController, restaurant: Restaurant
                 }
             } ?: Text(text = "No menu available.")
         }
+    }
+
+    if (showReviewDialog) {
+        AlertDialog(
+            onDismissRequest = { showReviewDialog = false },
+            title = { Text("Leave a Review") },
+            text = {
+                TextField(
+                    value = reviewText,
+                    onValueChange = { reviewText = it },
+                    label = { Text("Your Review") }
+                )
+            },
+            confirmButton = {
+                Button(onClick = {
+                    val review = Review(
+                        id = UUID.randomUUID(),
+                        userId = userId,
+                        userName = userName,
+                        restaurantId = restaurant.id,
+                        restaurantName = restaurant.name,
+                        text = reviewText
+                    )
+                    CoroutineScope(Dispatchers.IO).launch {
+                        ReviewRepository.addReview(review)
+                    }
+                    showReviewDialog = false
+                }) {
+                    Text("Submit")
+                }
+            },
+            dismissButton = {
+                Button(onClick = { showReviewDialog = false }) {
+                    Text("Cancel")
+                }
+            }
+        )
     }
 }
 
