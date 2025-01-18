@@ -70,7 +70,7 @@ fun ReviewCard(review: Review) {
         Column(modifier = Modifier.padding(16.dp)) {
             Text(text = "Restaurant: ${review.restaurantName}", style = MaterialTheme.typography.bodyLarge)
             Text(text = "Review: ${review.text}", style = MaterialTheme.typography.bodyMedium)
-            Text(text = "By: ${review.userName}", style = MaterialTheme.typography.bodySmall)
+            Text(text = "By: ${review.userEmail}", style = MaterialTheme.typography.bodySmall)
         }
     }
 }

@@ -1,12 +1,13 @@
 package com.example.dineDelight.models
 
+import com.google.firebase.firestore.DocumentId
 import java.util.UUID
 
 data class Review(
-    val id: UUID = UUID.randomUUID(),
+    @DocumentId val id: String = UUID.randomUUID().toString(), // Firestore Document ID
     val userId: String = "",
-    val userName: String = "",
-    val restaurantId: UUID = UUID.randomUUID(),
+    val userEmail: String = "",
+    val restaurantId: String = "",
     val restaurantName: String = "",
     val text: String = ""
 )

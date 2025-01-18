@@ -10,7 +10,12 @@ object ReviewRepository {
     private val reviewsCollection = db.collection("reviews")
 
     suspend fun addReview(review: Review) {
-        reviewsCollection.document(review.id.toString()).set(review).await()
+        try {
+            reviewsCollection.document(review.id.toString()).set(review).await()
+        } catch (e: Exception) {
+            // Log the error or handle it as needed
+            throw e
+        }
     }
 
     suspend fun getUserReviews(userId: String): List<Review> {
@@ -18,6 +23,10 @@ object ReviewRepository {
     }
 
     suspend fun getRestaurantReviews(restaurantId: UUID): List<Review> {
-        return reviewsCollection.whereEqualTo("restaurantId", restaurantId).get().await().toObjects(Review::class.java)
+        return reviewsCollection
+            .whereEqualTo("restaurantId", restaurantId)
+            .get()
+            .await()
+            .toObjects(Review::class.java)
     }
 }

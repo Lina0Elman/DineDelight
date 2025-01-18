@@ -1,6 +1,5 @@
 package com.example.dineDelight.pages
 
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -30,7 +29,6 @@ import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.http.GET
 import retrofit2.http.Query
-import java.util.UUID
 
 @Composable
 fun RestaurantDetailsScreen(navController: NavController, restaurant: Restaurant) {
@@ -39,7 +37,7 @@ fun RestaurantDetailsScreen(navController: NavController, restaurant: Restaurant
     var showReviewDialog by remember { mutableStateOf(false) }
     var reviewText by remember { mutableStateOf("") }
     val userId = FirebaseAuth.getInstance().currentUser?.uid.orEmpty()
-    val userName = FirebaseAuth.getInstance().currentUser?.email.orEmpty()
+    val userEmail = FirebaseAuth.getInstance().currentUser?.email.orEmpty()
 
     LaunchedEffect(restaurant) {
         loading = true
@@ -123,17 +121,22 @@ fun RestaurantDetailsScreen(navController: NavController, restaurant: Restaurant
             confirmButton = {
                 Button(onClick = {
                     val review = Review(
-                        id = UUID.randomUUID(),
                         userId = userId,
-                        userName = userName,
-                        restaurantId = restaurant.id,
+                        userEmail = userEmail,
+                        restaurantId = restaurant.id.toString(),
                         restaurantName = restaurant.name,
                         text = reviewText
                     )
                     CoroutineScope(Dispatchers.IO).launch {
-                        ReviewRepository.addReview(review)
+                        try {
+                            ReviewRepository.addReview(review)
+                            showReviewDialog = false
+                            reviewText = "" // Reset review text on successful submission
+                        } catch (e: Exception) {
+                            // Log the error or show a toast message for the failure
+                            e.printStackTrace()
+                        }
                     }
-                    showReviewDialog = false
                 }) {
                     Text("Submit")
                 }
