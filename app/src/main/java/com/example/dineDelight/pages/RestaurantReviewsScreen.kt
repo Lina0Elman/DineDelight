@@ -47,24 +47,43 @@ fun RestaurantReviewsScreen(navController: NavController, restaurant: Restaurant
             }
         )
 
-        LazyColumn(
+        // "Leave a Review" Button placed above the review list
+        Spacer(modifier = Modifier.height(16.dp))
+        Button(
+            onClick = { showReviewDialog = true },
             modifier = Modifier
-                .fillMaxSize()
-                .padding(16.dp),
-            verticalArrangement = Arrangement.Top,
-            horizontalAlignment = Alignment.Start
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp) // Adds space to the left and right of the button
         ) {
-            items(reviews) { review ->
-                ReviewCard(review)
-            }
+            Text("Leave a Review")
+        }
 
-            item {
-                Spacer(modifier = Modifier.height(16.dp))
-                Button(
-                    onClick = { showReviewDialog = true },
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    Text("Leave a Review")
+        Spacer(modifier = Modifier.height(16.dp))
+
+        // Display reviews or message if there are no reviews
+        if (reviews.isEmpty()) {
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(16.dp),
+                verticalArrangement = Arrangement.Center,
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Text(
+                    text = "This restaurant has no reviews yet",
+                    style = MaterialTheme.typography.bodyLarge
+                )
+            }
+        } else {
+            LazyColumn(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(16.dp),
+                verticalArrangement = Arrangement.Top,
+                horizontalAlignment = Alignment.Start
+            ) {
+                items(reviews) { review ->
+                    ReviewCard(review)
                 }
             }
         }
