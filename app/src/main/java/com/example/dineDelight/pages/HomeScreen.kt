@@ -80,6 +80,7 @@ fun HomeScreen(navController: NavController) {
         ) {
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
                 if (currentUser != null) {
+                    Spacer(modifier = Modifier.height(16.dp))
                     Text(
                         text = "Hello, ${currentUser?.email ?: "User"}!",
                         style = MaterialTheme.typography.bodyLarge
