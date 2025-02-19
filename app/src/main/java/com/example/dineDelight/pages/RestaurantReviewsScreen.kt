@@ -1,17 +1,22 @@
 package com.example.dineDelight.pages
 
+import android.net.Uri
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import coil.compose.AsyncImage
 import com.example.dineDelight.models.Restaurant
 import com.example.dineDelight.models.Review
 import com.example.dineDelight.repositories.ReviewRepository
@@ -26,12 +31,19 @@ fun RestaurantReviewsScreen(navController: NavController, restaurant: Restaurant
     var reviews by remember { mutableStateOf<List<Review>>(emptyList()) }
     var showReviewDialog by remember { mutableStateOf(false) }
     var reviewText by remember { mutableStateOf("") }
+    var selectedImageUri by remember { mutableStateOf<Uri?>(null) }
     val userId = FirebaseAuth.getInstance().currentUser?.uid.orEmpty()
     val userEmail = FirebaseAuth.getInstance().currentUser?.email.orEmpty()
 
     // Load reviews for the restaurant
     LaunchedEffect(restaurant) {
         reviews = ReviewRepository.getRestaurantReviews(restaurant.id)
+    }
+
+    val imagePickerLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.GetContent()
+    ) { uri: Uri? ->
+        selectedImageUri = uri
     }
 
     Column(
@@ -94,11 +106,20 @@ fun RestaurantReviewsScreen(navController: NavController, restaurant: Restaurant
                 onDismissRequest = { showReviewDialog = false },
                 title = { Text("Leave a Review") },
                 text = {
-                    TextField(
-                        value = reviewText,
-                        onValueChange = { reviewText = it },
-                        label = { Text("Your Review") }
-                    )
+                    Column {
+                        TextField(
+                            value = reviewText,
+                            onValueChange = { reviewText = it },
+                            label = { Text("Your Review") }
+                        )
+                        Spacer(modifier = Modifier.height(8.dp))
+                        Button(onClick = { imagePickerLauncher.launch("image/*") }) {
+                            Text("Select Image")
+                        }
+                        selectedImageUri?.let {
+                            Text("Image selected: ${it.lastPathSegment}")
+                        }
+                    }
                 },
                 confirmButton = {
                     Button(onClick = {
@@ -107,7 +128,8 @@ fun RestaurantReviewsScreen(navController: NavController, restaurant: Restaurant
                             userEmail = userEmail,
                             restaurantId = restaurant.id,
                             restaurantName = restaurant.name,
-                            text = reviewText
+                            text = reviewText,
+                            imageUrl = selectedImageUri.toString() // Store the image URI
                         )
                         CoroutineScope(Dispatchers.IO).launch {
                             try {
@@ -115,6 +137,7 @@ fun RestaurantReviewsScreen(navController: NavController, restaurant: Restaurant
                                 reviews = ReviewRepository.getRestaurantReviews(restaurant.id) // Refresh reviews
                                 showReviewDialog = false
                                 reviewText = "" // Reset review text on successful submission
+                                selectedImageUri = null // Reset selected image
                             } catch (e: Exception) {
                                 e.printStackTrace() // Handle errors
                             }
@@ -147,6 +170,17 @@ fun ReviewCard(review: Review) {
         ) {
             Text(text = review.userEmail, style = MaterialTheme.typography.bodyLarge)
             Text(text = review.text, style = MaterialTheme.typography.bodyMedium)
+            if (review.imageUrl.isNotEmpty() && review.imageUrl != "" && review.imageUrl != "null") {
+                AsyncImage(
+                    model = review.imageUrl,
+                    contentDescription = null,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(150.dp)
+                        .clip(MaterialTheme.shapes.medium),
+                    contentScale = ContentScale.Crop
+                )
+            }
         }
     }
 }

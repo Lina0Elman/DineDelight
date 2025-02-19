@@ -9,5 +9,6 @@ data class Review(
     val userEmail: String = "",
     val restaurantId: Int = 0,
     val restaurantName: String = "",
-    val text: String = ""
+    val text: String = "",
+    val imageUrl: String = ""
 )
