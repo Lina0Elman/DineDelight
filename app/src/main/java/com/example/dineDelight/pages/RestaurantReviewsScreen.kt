@@ -14,6 +14,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import coil.compose.AsyncImage
@@ -24,6 +25,7 @@ import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -34,8 +36,10 @@ fun RestaurantReviewsScreen(navController: NavController, restaurant: Restaurant
     var selectedImageUri by remember { mutableStateOf<Uri?>(null) }
     val userId = FirebaseAuth.getInstance().currentUser?.uid.orEmpty()
     val userEmail = FirebaseAuth.getInstance().currentUser?.email.orEmpty()
+    val context = LocalContext.current
 
-    // Load reviews for the restaurant
+    val coroutineScope = rememberCoroutineScope()
+
     LaunchedEffect(restaurant) {
         reviews = ReviewRepository.getRestaurantReviews(restaurant.id)
     }
@@ -49,7 +53,6 @@ fun RestaurantReviewsScreen(navController: NavController, restaurant: Restaurant
     Column(
         modifier = Modifier.fillMaxSize()
     ) {
-        // Top Bar with Back Button
         TopAppBar(
             title = { Text("Restaurant Reviews") },
             navigationIcon = {
@@ -59,20 +62,18 @@ fun RestaurantReviewsScreen(navController: NavController, restaurant: Restaurant
             }
         )
 
-        // "Leave a Review" Button placed above the review list
         Spacer(modifier = Modifier.height(16.dp))
         Button(
             onClick = { showReviewDialog = true },
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 16.dp) // Adds space to the left and right of the button
+                .padding(horizontal = 16.dp)
         ) {
             Text("Leave a Review")
         }
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        // Display reviews or message if there are no reviews
         if (reviews.isEmpty()) {
             Column(
                 modifier = Modifier
@@ -100,7 +101,6 @@ fun RestaurantReviewsScreen(navController: NavController, restaurant: Restaurant
             }
         }
 
-        // Review Dialog
         if (showReviewDialog) {
             AlertDialog(
                 onDismissRequest = { showReviewDialog = false },
@@ -123,23 +123,26 @@ fun RestaurantReviewsScreen(navController: NavController, restaurant: Restaurant
                 },
                 confirmButton = {
                     Button(onClick = {
-                        val review = Review(
-                            userId = userId,
-                            userEmail = userEmail,
-                            restaurantId = restaurant.id,
-                            restaurantName = restaurant.name,
-                            text = reviewText,
-                            imageUrl = selectedImageUri.toString() // Store the image URI
-                        )
-                        CoroutineScope(Dispatchers.IO).launch {
+                        coroutineScope.launch {
                             try {
+                                val imageId = withContext(Dispatchers.IO) { selectedImageUri?.let { ReviewRepository.saveImageToLocalDatabase(context, it) } ?: "" }
+                                val review = Review(
+                                    userId = userId,
+                                    userEmail = userEmail,
+                                    restaurantId = restaurant.id,
+                                    restaurantName = restaurant.name,
+                                    text = reviewText,
+                                    imageUrl = imageId
+                                )
                                 ReviewRepository.addReview(review)
-                                reviews = ReviewRepository.getRestaurantReviews(restaurant.id) // Refresh reviews
-                                showReviewDialog = false
-                                reviewText = "" // Reset review text on successful submission
-                                selectedImageUri = null // Reset selected image
+                                reviews = ReviewRepository.getRestaurantReviews(restaurant.id)
+                                withContext(Dispatchers.Main) {
+                                    showReviewDialog = false
+                                    reviewText = ""
+                                    selectedImageUri = null
+                                }
                             } catch (e: Exception) {
-                                e.printStackTrace() // Handle errors
+                                e.printStackTrace()
                             }
                         }
                     }) {
@@ -158,6 +161,16 @@ fun RestaurantReviewsScreen(navController: NavController, restaurant: Restaurant
 
 @Composable
 fun ReviewCard(review: Review) {
+    val context = LocalContext.current
+    val coroutineScope = rememberCoroutineScope()
+    var imageUri by remember { mutableStateOf<Uri?>(null) }
+
+    LaunchedEffect(review.imageUrl) {
+        coroutineScope.launch {
+            imageUri = ReviewRepository.getImageUriById(review.imageUrl)
+        }
+    }
+
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -170,9 +183,9 @@ fun ReviewCard(review: Review) {
         ) {
             Text(text = review.userEmail, style = MaterialTheme.typography.bodyLarge)
             Text(text = review.text, style = MaterialTheme.typography.bodyMedium)
-            if (review.imageUrl.isNotEmpty() && review.imageUrl != "" && review.imageUrl != "null") {
+            imageUri?.let {
                 AsyncImage(
-                    model = review.imageUrl,
+                    model = it,
                     contentDescription = null,
                     modifier = Modifier
                         .fillMaxWidth()

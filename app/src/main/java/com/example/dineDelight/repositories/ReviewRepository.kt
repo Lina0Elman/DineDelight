@@ -1,12 +1,29 @@
 package com.example.dineDelight.repositories
 
+import android.content.Context
+import android.net.Uri
+import androidx.room.Room
 import com.example.dineDelight.models.Review
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.tasks.await
+import java.util.UUID
+import com.example.dineDelight.database.AppDatabase
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
+import com.example.dineDelight.models.ImageEntity
 
 object ReviewRepository {
     private val db = FirebaseFirestore.getInstance()
     private val reviewsCollection = db.collection("reviews")
+
+    private lateinit var imagesDB: AppDatabase
+
+    fun initialize(context: Context) {
+        imagesDB = Room.databaseBuilder(
+            context.applicationContext,
+            AppDatabase::class.java, "dine_delight_db"
+        ).build()
+    }
 
     suspend fun addReview(review: Review) {
         try {
@@ -61,6 +78,23 @@ object ReviewRepository {
         } catch (e: Exception) {
             // Log or handle the error as needed
             throw e
+        }
+    }
+
+    suspend fun saveImageToLocalDatabase(context: Context, uri: Uri): String {
+        return withContext(Dispatchers.IO) {
+            val imageId = UUID.randomUUID().toString()
+            val imageEntity = ImageEntity(id = imageId, uri = uri.toString())
+            imagesDB.imageDao().insertImage(imageEntity)
+            imageId
+        }
+    }
+
+    suspend fun getImageUriById(imageId: String): Uri? {
+        return withContext(Dispatchers.IO) {
+            imagesDB.imageDao().getImageById(imageId)?.let {
+                Uri.parse(it.uri)
+            }
         }
     }
 }

@@ -30,6 +30,7 @@ import com.google.firebase.FirebaseApp
 import java.util.UUID
 import com.google.firebase.auth.FirebaseAuth
 import com.example.dineDelight.pages.UserReviewsScreen
+import com.example.dineDelight.repositories.ReviewRepository
 
 
 class MainActivity : ComponentActivity() {
@@ -38,6 +39,7 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         FirebaseApp.initializeApp(this)
+        ReviewRepository.initialize(this)
         auth = FirebaseAuth.getInstance()
 
         setContent {
