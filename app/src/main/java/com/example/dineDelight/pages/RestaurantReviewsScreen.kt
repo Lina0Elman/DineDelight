@@ -20,6 +20,7 @@ import androidx.navigation.NavController
 import coil.compose.AsyncImage
 import com.example.dineDelight.models.Restaurant
 import com.example.dineDelight.models.Review
+import com.example.dineDelight.repositories.ImageRepository
 import com.example.dineDelight.repositories.ReviewRepository
 import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.CoroutineScope
@@ -125,7 +126,7 @@ fun RestaurantReviewsScreen(navController: NavController, restaurant: Restaurant
                     Button(onClick = {
                         coroutineScope.launch {
                             try {
-                                val imageId = withContext(Dispatchers.IO) { selectedImageUri?.let { ReviewRepository.saveImageToLocalDatabase(context, it) } ?: "" }
+                                val imageId = withContext(Dispatchers.IO) { selectedImageUri?.let { ImageRepository.saveImageToLocalDatabase(it) } ?: "" }
                                 val review = Review(
                                     userId = userId,
                                     userEmail = userEmail,
@@ -167,7 +168,7 @@ fun ReviewCard(review: Review) {
 
     LaunchedEffect(review.imageUrl) {
         coroutineScope.launch {
-            imageUri = ReviewRepository.getImageUriById(review.imageUrl)
+            imageUri = ImageRepository.getImageUriById(review.imageUrl)
         }
     }
 

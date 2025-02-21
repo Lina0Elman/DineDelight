@@ -17,6 +17,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.dineDelight.pages.HomeScreen
 import com.example.dineDelight.pages.LoginScreen
+import com.example.dineDelight.pages.ProfileScreen
 import com.example.dineDelight.pages.RegisterScreen
 import com.example.dineDelight.pages.RestaurantDetailsScreen
 import com.example.dineDelight.pages.ReservationScreen
@@ -76,6 +77,10 @@ class MainActivity : ComponentActivity() {
 
                         composable("register") {
                             RegisterScreen(navController)
+                        }
+
+                        composable("profile") {
+                            ProfileScreen(navController)
                         }
 
                         composable("home") {

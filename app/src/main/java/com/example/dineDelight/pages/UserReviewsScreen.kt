@@ -17,6 +17,7 @@ import androidx.navigation.NavController
 import coil.compose.AsyncImage
 import com.example.dineDelight.models.Reservation
 import com.example.dineDelight.models.Review
+import com.example.dineDelight.repositories.ImageRepository
 import com.example.dineDelight.repositories.ReservationRepository
 import com.example.dineDelight.repositories.ReviewRepository
 import com.example.dineDelight.views.BottomNavigationBar
@@ -107,7 +108,7 @@ fun ReviewCard(review: Review, onDelete: () -> Unit, onUpdate: () -> Unit) {
 
     LaunchedEffect(review.imageUrl) {
         coroutineScope.launch {
-            imageUri = ReviewRepository.getImageUriById(review.imageUrl)
+            imageUri = ImageRepository.getImageUriById(review.imageUrl)
         }
     }
 
