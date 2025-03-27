@@ -33,7 +33,7 @@ fun ProfileScreen(navController: NavController) {
     val firebaseAuth = FirebaseAuth.getInstance()
     val user = firebaseAuth.currentUser
     val userId = user?.uid.orEmpty()
-    val userName = user?.displayName.orEmpty()
+    var userName by rememberSaveable { mutableStateOf(user?.displayName.orEmpty()) }
     val userEmail = user?.email.orEmpty()
 
     var profileImageUri by rememberSaveable { mutableStateOf<Uri?>(null) }
@@ -145,7 +145,30 @@ fun ProfileScreen(navController: NavController) {
                 }
                 Spacer(modifier = Modifier.height(16.dp))
 
-                Text(text = "Name: $userName", style = MaterialTheme.typography.bodyLarge)
+                TextField(
+                    value = userName,
+                    onValueChange = { userName = it },
+                    label = { Text("Name") },
+                    modifier = Modifier.fillMaxWidth()
+                )
+                Spacer(modifier = Modifier.height(16.dp))
+
+                Button(onClick = {
+                    coroutineScope.launch {
+                        try {
+                            val updates = userProfileChangeRequest {
+                                displayName = userName
+                            }
+                            user?.updateProfile(updates)
+                        } catch (e: Exception) {
+                            errorMessage = e.message
+                        }
+                    }
+                }) {
+                    Text("Update Name")
+                }
+                Spacer(modifier = Modifier.height(16.dp))
+
                 Text(text = "Email: $userEmail", style = MaterialTheme.typography.bodyLarge)
 
                 Spacer(modifier = Modifier.height(16.dp))
