@@ -10,5 +10,5 @@ data class Review(
     val restaurantId: Int = 0,
     val restaurantName: String = "",
     val text: String = "",
-    val imageUrl: String = ""
+    val imageId: String? = null
 )
