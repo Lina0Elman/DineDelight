@@ -80,21 +80,4 @@ object ReviewRepository {
             throw e
         }
     }
-
-    suspend fun saveImageToLocalDatabase(context: Context, uri: Uri): String {
-        return withContext(Dispatchers.IO) {
-            val imageId = UUID.randomUUID().toString()
-            val imageEntity = ImageEntity(id = imageId, uri = uri.toString())
-            imagesDB.imageDao().insertImage(imageEntity)
-            imageId
-        }
-    }
-
-    suspend fun getImageUriById(imageId: String): Uri? {
-        return withContext(Dispatchers.IO) {
-            imagesDB.imageDao().getImageById(imageId)?.let {
-                Uri.parse(it.uri)
-            }
-        }
-    }
 }

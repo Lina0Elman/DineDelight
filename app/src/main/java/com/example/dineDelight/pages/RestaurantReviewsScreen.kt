@@ -18,14 +18,21 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import coil.compose.AsyncImage
+import com.example.dineDelight.models.Image
 import com.example.dineDelight.models.Restaurant
 import com.example.dineDelight.models.Review
+import com.example.dineDelight.repositories.ImageRepository
 import com.example.dineDelight.repositories.ReviewRepository
+import com.example.dineDelight.utils.BlobUtils.toBase64String
+import com.example.dineDelight.utils.BlobUtils.toBlob
+import com.example.dineDelight.utils.BlobUtils.toBitmap
+import com.example.dineDelight.utils.BlobUtils.toUri
 import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import java.util.UUID
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -125,14 +132,23 @@ fun RestaurantReviewsScreen(navController: NavController, restaurant: Restaurant
                     Button(onClick = {
                         coroutineScope.launch {
                             try {
-                                val imageId = withContext(Dispatchers.IO) { selectedImageUri?.let { ReviewRepository.saveImageToLocalDatabase(context, it) } ?: "" }
+                                val imageId = UUID.randomUUID().toString()
+                                withContext(Dispatchers.IO) {
+                                    selectedImageUri?.let { uri ->
+                                        val blob = uri.toBlob(context)!!.toBase64String()
+                                        ImageRepository.addImage(Image(
+                                            id = imageId,
+                                            blobBase64String = blob
+                                        ))
+                                    }
+                                }
                                 val review = Review(
                                     userId = userId,
                                     userEmail = userEmail,
                                     restaurantId = restaurant.id,
                                     restaurantName = restaurant.name,
                                     text = reviewText,
-                                    imageUrl = imageId
+                                    imageId = imageId
                                 )
                                 ReviewRepository.addReview(review)
                                 reviews = ReviewRepository.getRestaurantReviews(restaurant.id)
@@ -165,9 +181,16 @@ fun ReviewCard(review: Review) {
     val coroutineScope = rememberCoroutineScope()
     var imageUri by remember { mutableStateOf<Uri?>(null) }
 
-    LaunchedEffect(review.imageUrl) {
-        coroutineScope.launch {
-            imageUri = ReviewRepository.getImageUriById(review.imageUrl)
+    LaunchedEffect(review.imageId) {
+        if (review.imageId != null) {
+            coroutineScope.launch {
+                val image = ImageRepository.getImageById(review.imageId)
+                imageUri = image?.blobBase64String?.toBlob()?.toBitmap()?.let {
+                    bitmap ->
+                    val uri = bitmap.toUri(context)
+                    uri
+                }
+            }
         }
     }
 

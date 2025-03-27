@@ -17,8 +17,12 @@ import androidx.navigation.NavController
 import coil.compose.AsyncImage
 import com.example.dineDelight.models.Reservation
 import com.example.dineDelight.models.Review
+import com.example.dineDelight.repositories.ImageRepository
 import com.example.dineDelight.repositories.ReservationRepository
 import com.example.dineDelight.repositories.ReviewRepository
+import com.example.dineDelight.utils.BlobUtils.toBitmap
+import com.example.dineDelight.utils.BlobUtils.toBlob
+import com.example.dineDelight.utils.BlobUtils.toUri
 import com.example.dineDelight.views.BottomNavigationBar
 import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.CoroutineScope
@@ -105,9 +109,16 @@ fun ReviewCard(review: Review, onDelete: () -> Unit, onUpdate: () -> Unit) {
     val coroutineScope = rememberCoroutineScope()
     var imageUri by remember { mutableStateOf<Uri?>(null) }
 
-    LaunchedEffect(review.imageUrl) {
-        coroutineScope.launch {
-            imageUri = ReviewRepository.getImageUriById(review.imageUrl)
+    LaunchedEffect(review.imageId) {
+        if (review.imageId != null) {
+            coroutineScope.launch {
+                val image = ImageRepository.getImageById(review.imageId)
+                imageUri = image?.blobBase64String?.toBlob()?.toBitmap()?.let {
+                    bitmap ->
+                    val uri = bitmap.toUri(context)
+                    uri
+                }
+            }
         }
     }
 
