@@ -6,7 +6,7 @@ import java.util.UUID
 object RestaurantRepository {
     private val restaurants: MutableList<Restaurant> = mutableListOf(
         Restaurant(
-            id = UUID.randomUUID(),
+            id = 1,
             name = "Italian Delight",
             rating = 4.5f,
             availableSlots = listOf("18:00", "19:00", "20:00"),
@@ -15,7 +15,7 @@ object RestaurantRepository {
             description = "Well known for our special tomato sauce"
         ),
         Restaurant(
-            id = UUID.randomUUID(),
+            id = 2,
             name = "Sushi Paradise",
             rating = 4.8f,
             availableSlots = listOf("17:30", "18:30", "19:30"),
@@ -24,7 +24,7 @@ object RestaurantRepository {
             description = "Eat the best sushi in town"
         ),
         Restaurant(
-            id = UUID.randomUUID(),
+            id = 3,
             name = "Canadian Bistro",
             rating = 4.2f,
             availableSlots = listOf("12:00", "13:00", "14:00"),
@@ -33,7 +33,7 @@ object RestaurantRepository {
             description = "Taste the flavors of Canada"
         ),
         Restaurant(
-            id = UUID.randomUUID(),
+            id = 4,
             name = "American Grill",
             rating = 4.6f,
             availableSlots = listOf("17:00", "18:00", "19:00"),
@@ -42,7 +42,7 @@ object RestaurantRepository {
             description = "Enjoy classic American dishes"
         ),
         Restaurant(
-            id = UUID.randomUUID(),
+            id = 5,
             name = "Mexican Fiesta",
             rating = 4.7f,
             availableSlots = listOf("16:00", "17:00", "18:00"),
@@ -51,7 +51,7 @@ object RestaurantRepository {
             description = "Spice up your meal with Mexican cuisine"
         ),
         Restaurant(
-            id = UUID.randomUUID(),
+            id = 6,
             name = "French Elegance",
             rating = 4.9f,
             availableSlots = listOf("19:00", "20:00", "21:00"),
@@ -60,7 +60,7 @@ object RestaurantRepository {
             description = "Experience the taste of France"
         ),
         Restaurant(
-            id = UUID.randomUUID(),
+            id = 7,
             name = "Indian Spice",
             rating = 4.4f,
             availableSlots = listOf("18:30", "19:30", "20:30"),
@@ -69,7 +69,7 @@ object RestaurantRepository {
             description = "Savor the rich flavors of India"
         ),
         Restaurant(
-            id = UUID.randomUUID(),
+            id = 8,
             name = "Greek Taverna",
             rating = 4.3f,
             availableSlots = listOf("12:30", "13:30", "14:30"),
@@ -78,7 +78,7 @@ object RestaurantRepository {
             description = "Enjoy traditional Greek dishes"
         ),
         Restaurant(
-            id = UUID.randomUUID(),
+            id = 9,
             name = "Moroccan Delight",
             rating = 4.5f,
             availableSlots = listOf("17:00", "18:00", "19:00"),

@@ -18,6 +18,7 @@ import com.google.firebase.auth.FirebaseAuth
 import com.example.dineDelight.models.Restaurant
 import com.example.dineDelight.repositories.ReservationRepository
 import com.example.dineDelight.models.Reservation
+import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -28,6 +29,9 @@ fun ReservationScreen(navController: NavController, restaurant: Restaurant) {
     val reservedSlots = allReservations.filter { it.restaurantId == restaurant.id }.map { it.time }
     var selectedSlot by remember { mutableStateOf<String?>(null) }
     var showDialog by remember { mutableStateOf(false) }
+
+    // Create a CoroutineScope to launch suspend functions
+    val coroutineScope = rememberCoroutineScope()
 
     Column(
         modifier = Modifier.fillMaxSize().padding(16.dp),
@@ -70,16 +74,23 @@ fun ReservationScreen(navController: NavController, restaurant: Restaurant) {
             confirmButton = {
                 TextButton(
                     onClick = {
-                        val newReservation = Reservation(
-                            id = UUID.randomUUID(),
-                            userId = userId,
-                            restaurantId = restaurant.id,
-                            restaurantName = restaurant.name,
-                            time = selectedSlot!!
-                        )
-                        ReservationRepository.addReservation(newReservation)
-                        showDialog = false
-                        navController.navigate("home")
+                        // Launch the suspend function inside a coroutine
+                        coroutineScope.launch {
+                            val newReservation = Reservation(
+                                userId = userId,
+                                restaurantId = restaurant.id,
+                                restaurantName = restaurant.name,
+                                time = selectedSlot!!
+                            )
+                            try {
+                                ReservationRepository.addReservation(newReservation)
+                                navController.navigate("home")  // Navigate after reservation
+                            } catch (e: Exception) {
+                                Log.e("ReservationScreen", "Error adding reservation: ${e.message}")
+                            } finally {
+                                showDialog = false
+                            }
+                        }
                     }
                 ) {
                     Text("Yes")

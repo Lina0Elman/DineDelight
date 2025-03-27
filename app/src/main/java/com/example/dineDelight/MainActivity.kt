@@ -20,13 +20,17 @@ import com.example.dineDelight.pages.LoginScreen
 import com.example.dineDelight.pages.RegisterScreen
 import com.example.dineDelight.pages.RestaurantDetailsScreen
 import com.example.dineDelight.pages.ReservationScreen
+import com.example.dineDelight.pages.RestaurantReviewsScreen
 import com.example.dineDelight.pages.UpdateReservationScreen
+import com.example.dineDelight.pages.UpdateReviewScreen
 import com.example.dineDelight.pages.UserReservationsScreen
 import com.example.dineDelight.repositories.RestaurantRepository
 import com.example.dineDelight.ui.theme.MyApplicationTheme
 import com.google.firebase.FirebaseApp
 import java.util.UUID
 import com.google.firebase.auth.FirebaseAuth
+import com.example.dineDelight.pages.UserReviewsScreen
+import com.example.dineDelight.repositories.ReviewRepository
 
 
 class MainActivity : ComponentActivity() {
@@ -35,6 +39,7 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         FirebaseApp.initializeApp(this)
+        ReviewRepository.initialize(this)
         auth = FirebaseAuth.getInstance()
 
         setContent {
@@ -77,6 +82,10 @@ class MainActivity : ComponentActivity() {
                             HomeScreen(navController)
                         }
 
+                        composable("my_reviews") {
+                            UserReviewsScreen(navController)
+                        }
+
                         composable("user_reservations") {
                             UserReservationsScreen(navController)
                         }
@@ -84,6 +93,11 @@ class MainActivity : ComponentActivity() {
                         composable("update_reservation/{reservationId}") { backStackEntry ->
                             val reservationId = UUID.fromString(backStackEntry.arguments?.getString("reservationId"))
                             UpdateReservationScreen(navController, reservationId)
+                        }
+
+                        composable("update_review/{reviewId}") { backStackEntry ->
+                            val reviewId = UUID.fromString(backStackEntry.arguments?.getString("reviewId"))
+                            UpdateReviewScreen(navController, reviewId.toString())
                         }
 
                         // Set up navigation for each restaurant
@@ -96,6 +110,10 @@ class MainActivity : ComponentActivity() {
                                 val restaurantId = backStackEntry.arguments?.getString("restaurantId")
                                 val restaurant = RestaurantRepository.getRestaurants().find { it.id.toString() == restaurantId }
                                 restaurant?.let { ReservationScreen(navController, it) }
+                            }
+
+                            composable("restaurant_reviews/${restaurant.id}") {
+                                RestaurantReviewsScreen(navController, restaurant)
                             }
                         }
                     }

@@ -13,14 +13,22 @@ import com.example.dineDelight.models.Reservation
 import com.example.dineDelight.repositories.ReservationRepository
 import com.example.dineDelight.views.BottomNavigationBar
 import com.google.firebase.auth.FirebaseAuth
+import kotlinx.coroutines.launch
 
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun UserReservationsScreen(navController: NavController) {
     val userId = FirebaseAuth.getInstance().currentUser?.uid.orEmpty()
-    var reservations by remember { mutableStateOf(ReservationRepository.getUserReservations(userId)) }
+    var reservations by remember { mutableStateOf<List<Reservation>>(emptyList()) }
+    val coroutineScope = rememberCoroutineScope()
 
+    // Fetch reservations in a coroutine when the screen is first launched
+    LaunchedEffect(userId) {
+        coroutineScope.launch {
+            reservations = ReservationRepository.getUserReservations(userId)
+        }
+    }
 
     Scaffold(
         topBar = {
@@ -47,22 +55,24 @@ fun UserReservationsScreen(navController: NavController) {
             } else {
                 LazyColumn {
                     items(reservations) { reservation ->
-                        ReservationCard(reservation,
+                        ReservationCard(
+                            reservation,
                             onDelete = {
-                                ReservationRepository.deleteReservation(reservation.id)
-                                reservations = ReservationRepository.getUserReservations(userId)
-                            }, onUpdate = {
+                                coroutineScope.launch {
+                                    ReservationRepository.deleteReservation(reservation.id)
+                                    reservations = ReservationRepository.getUserReservations(userId)
+                                }
+                            },
+                            onUpdate = {
                                 navController.navigate("update_reservation/${reservation.id}")
-                            })
+                            }
+                        )
                     }
                 }
             }
         }
     }
 }
-
-
-
 
 @Composable
 fun ReservationCard(reservation: Reservation, onDelete: () -> Unit, onUpdate: () -> Unit) {
