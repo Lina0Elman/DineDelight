@@ -39,10 +39,15 @@ object BlobUtils {
     }
 
     fun Bitmap.toUri(context: Context): Uri? {
-        val bytes = ByteArrayOutputStream()
-        this.compress(Bitmap.CompressFormat.PNG, 100, bytes)
-        val path = MediaStore.Images.Media.insertImage(context.contentResolver, this, "Title", null)
-        return Uri.parse(path)
+        return try {
+            val bytes = ByteArrayOutputStream()
+            this.compress(Bitmap.CompressFormat.PNG, 100, bytes)
+            val path = MediaStore.Images.Media.insertImage(context.contentResolver, this, "Title", null)
+            Uri.parse(path)
+        }
+        catch (e: Exception) {
+            null
+        }
     }
 
     /**

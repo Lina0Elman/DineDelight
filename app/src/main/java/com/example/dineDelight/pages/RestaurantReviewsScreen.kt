@@ -41,6 +41,7 @@ fun RestaurantReviewsScreen(navController: NavController, restaurant: Restaurant
     var showReviewDialog by remember { mutableStateOf(false) }
     var reviewText by remember { mutableStateOf("") }
     var selectedImageUri by remember { mutableStateOf<Uri?>(null) }
+    var errorMessage by remember { mutableStateOf<String?>(null) }
     val userId = FirebaseAuth.getInstance().currentUser?.uid.orEmpty()
     val userEmail = FirebaseAuth.getInstance().currentUser?.email.orEmpty()
     val context = LocalContext.current
@@ -126,6 +127,13 @@ fun RestaurantReviewsScreen(navController: NavController, restaurant: Restaurant
                         selectedImageUri?.let {
                             Text("Image selected: ${it.lastPathSegment}")
                         }
+                        errorMessage?.let {
+                            Text(
+                                text = it,
+                                color = MaterialTheme.colorScheme.error,
+                                style = MaterialTheme.typography.bodyMedium
+                            )
+                        }
                     }
                 },
                 confirmButton = {
@@ -136,6 +144,9 @@ fun RestaurantReviewsScreen(navController: NavController, restaurant: Restaurant
                                 withContext(Dispatchers.IO) {
                                     selectedImageUri?.let { uri ->
                                         val blob = uri.toBlob(context)!!.toBase64String()
+                                        if (blob.length > 1048487) {
+                                            throw IllegalArgumentException("Image size exceeds the limit.")
+                                        }
                                         ImageRepository.addImage(Image(
                                             id = imageId,
                                             blobBase64String = blob
@@ -156,6 +167,11 @@ fun RestaurantReviewsScreen(navController: NavController, restaurant: Restaurant
                                     showReviewDialog = false
                                     reviewText = ""
                                     selectedImageUri = null
+                                    errorMessage = null
+                                }
+                            } catch (e: IllegalArgumentException) {
+                                withContext(Dispatchers.Main) {
+                                    errorMessage = e.message
                                 }
                             } catch (e: Exception) {
                                 e.printStackTrace()
