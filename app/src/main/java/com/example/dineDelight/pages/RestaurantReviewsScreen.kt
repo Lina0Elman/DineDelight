@@ -6,6 +6,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.*
@@ -18,6 +19,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import coil.compose.AsyncImage
+import com.example.dineDelight.R
 import com.example.dineDelight.models.Image
 import com.example.dineDelight.models.Restaurant
 import com.example.dineDelight.models.Review
@@ -196,17 +198,21 @@ fun ReviewCard(review: Review) {
     val context = LocalContext.current
     val coroutineScope = rememberCoroutineScope()
     var imageUri by remember { mutableStateOf<Uri?>(null) }
+    var profileImageUri by remember { mutableStateOf<Uri?>(null) }
 
     LaunchedEffect(review.imageId) {
         if (review.imageId != null) {
             coroutineScope.launch {
                 val image = ImageRepository.getImageById(review.imageId)
-                imageUri = image?.blobBase64String?.toBlob()?.toBitmap()?.let {
-                    bitmap ->
-                    val uri = bitmap.toUri(context)
-                    uri
-                }
+                imageUri = image?.blobBase64String?.toBlob()?.toBitmap()?.toUri(context)
             }
+        }
+    }
+
+    LaunchedEffect(review.userId) {
+        coroutineScope.launch {
+            val profileImage = ImageRepository.getImageById(review.userId)
+            profileImageUri = profileImage?.blobBase64String?.toBlob()?.toBitmap()?.toUri(context)
         }
     }
 
@@ -216,23 +222,37 @@ fun ReviewCard(review: Review) {
             .padding(vertical = 8.dp),
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
     ) {
-        Column(
-            modifier = Modifier.padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(4.dp)
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp)
         ) {
-            Text(text = review.userEmail, style = MaterialTheme.typography.bodyLarge)
-            Text(text = review.text, style = MaterialTheme.typography.bodyMedium)
-            imageUri?.let {
-                AsyncImage(
-                    model = it,
-                    contentDescription = null,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(150.dp)
-                        .clip(MaterialTheme.shapes.medium),
-                    contentScale = ContentScale.Crop
-                )
+            Column(
+                modifier = Modifier.fillMaxWidth(),
+                verticalArrangement = Arrangement.spacedBy(4.dp)
+            ) {
+                Text(text = review.userEmail, style = MaterialTheme.typography.bodyLarge)
+                Text(text = review.text, style = MaterialTheme.typography.bodyMedium)
+                imageUri?.let {
+                    AsyncImage(
+                        model = it,
+                        contentDescription = null,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(150.dp)
+                            .clip(MaterialTheme.shapes.medium),
+                        contentScale = ContentScale.Crop
+                    )
+                }
             }
+            AsyncImage(
+                model = profileImageUri ?: R.drawable.default_profile_image,
+                contentDescription = "User Profile Picture",
+                modifier = Modifier
+                    .size(40.dp)
+                    .clip(CircleShape)
+                    .align(Alignment.TopEnd)
+            )
         }
     }
 }
