@@ -17,6 +17,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.dineDelight.pages.*
+import com.example.dineDelight.repositories.ImageRepository
 import com.example.dineDelight.repositories.RestaurantRepository
 import com.example.dineDelight.repositories.ReviewRepository
 import com.example.dineDelight.ui.theme.MyApplicationTheme
@@ -34,6 +35,7 @@ class MainActivity : ComponentActivity() {
 
         RestaurantRepository.initialize(this)
         ReviewRepository.initialize(this)
+        ImageRepository.initialize(this)
         auth = FirebaseAuth.getInstance()
 
         lifecycleScope.launch {

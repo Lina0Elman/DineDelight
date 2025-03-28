@@ -10,9 +10,9 @@ import com.example.dineDelight.models.RestaurantEntity
     entities = [
         ImageEntity::class,
         RestaurantEntity::class,
-        MealEntity::class
+        MealEntity::class,
     ],
-    version = 3
+    version = 4
 )
 abstract class AppDatabase : RoomDatabase() {
     abstract fun restaurantDao(): RestaurantDao

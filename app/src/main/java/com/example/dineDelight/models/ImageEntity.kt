@@ -6,5 +6,5 @@ import androidx.room.PrimaryKey
 @Entity(tableName = "images")
 data class ImageEntity(
     @PrimaryKey val id: String,
-    val uri: String
+    val blobBase64String: String?
 )
