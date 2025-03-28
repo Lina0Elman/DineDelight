@@ -14,30 +14,49 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.platform.LocalContext
 import coil.compose.AsyncImage
+import com.example.dineDelight.database.AppDatabase
 import com.example.dineDelight.models.Meal
 import com.example.dineDelight.models.Restaurant
 import com.example.dineDelight.models.RestaurantMenu
-import com.example.dineDelight.models.Review
-import com.example.dineDelight.repositories.ReviewRepository
 import com.example.dineDelight.utils.MealsApi
-import com.google.firebase.auth.FirebaseAuth
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.http.GET
 import retrofit2.http.Query
+import androidx.room.Room
+import com.example.dineDelight.models.MealEntity
 
 @Composable
 fun RestaurantDetailsScreen(navController: NavController, restaurant: Restaurant) {
     var restaurantMenu by remember { mutableStateOf<RestaurantMenu?>(null) }
     var loading by remember { mutableStateOf(true) }
+    val context = LocalContext.current
+    val db = remember {
+        Room.databaseBuilder(context, AppDatabase::class.java, "restaurant-db").build()
+    }
 
     LaunchedEffect(restaurant) {
         loading = true
-        restaurantMenu = fetchRestaurantMenu(restaurant)
+        val meals = db.mealDao().getMealsByRestaurant(restaurant.id.toString())
+        if (meals.isEmpty()) {
+            val fetchedMenu = fetchRestaurantMenu(restaurant)
+            fetchedMenu?.let { menu ->
+                val mealEntities = menu.meals.map { meal ->
+                    MealEntity(
+                        idMeal = meal.idMeal,
+                        strMeal = meal.strMeal,
+                        strMealThumb = meal.strMealThumb,
+                        restaurantId = restaurant.id.toString()
+                    )
+                }
+                db.mealDao().insertMeals(mealEntities)
+                restaurantMenu = fetchedMenu
+            }
+        } else {
+            restaurantMenu = RestaurantMenu( meals.map { meal -> Meal(meal.strMeal, meal.strMealThumb, meal.idMeal) })
+        }
         loading = false
     }
 

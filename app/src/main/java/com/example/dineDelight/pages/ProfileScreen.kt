@@ -178,7 +178,7 @@ fun ProfileScreen(navController: NavController) {
                         popUpTo(navController.graph.startDestinationId) { inclusive = true }
                     }
                 }) {
-                    Text("Sign Out")
+                    Text("Logout")
                 }
             }
         }
