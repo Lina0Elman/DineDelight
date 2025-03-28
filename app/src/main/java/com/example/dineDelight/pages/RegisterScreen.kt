@@ -23,9 +23,11 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.userProfileChangeRequest
 
 @Composable
 fun RegisterScreen(navController: NavController) {
+    var username by remember { mutableStateOf("") }
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     var confirmPassword by remember { mutableStateOf("") }
@@ -41,6 +43,16 @@ fun RegisterScreen(navController: NavController) {
         Text("Register for DineDelight", style = MaterialTheme.typography.titleLarge)
 
         Spacer(modifier = Modifier.height(16.dp))
+
+        TextField(
+            value = username,
+            onValueChange = { username = it },
+            label = { Text("Username") },
+            singleLine = true,
+            modifier = Modifier.fillMaxWidth()
+        )
+
+        Spacer(modifier = Modifier.height(8.dp))
 
         TextField(
             value = email,
@@ -82,9 +94,22 @@ fun RegisterScreen(navController: NavController) {
                             .createUserWithEmailAndPassword(email, password)
                             .addOnCompleteListener { task ->
                                 if (task.isSuccessful) {
-                                    navController.navigate("home") {
-                                        popUpTo("register") { inclusive = true }
+                                    // Once user is created, set displayName = username
+                                    val newUser = task.result?.user
+                                    val profileUpdates = userProfileChangeRequest {
+                                        displayName = username
                                     }
+                                    newUser?.updateProfile(profileUpdates)
+                                        ?.addOnCompleteListener { profileUpdateTask ->
+                                            if (profileUpdateTask.isSuccessful) {
+                                                // Navigate to home after successful update
+                                                navController.navigate("home") {
+                                                    popUpTo("register") { inclusive = true }
+                                                }
+                                            } else {
+                                                errorMessage = profileUpdateTask.exception?.message
+                                            }
+                                        }
                                 } else {
                                     errorMessage = task.exception?.message
                                 }
