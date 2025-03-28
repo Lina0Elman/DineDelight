@@ -79,9 +79,6 @@ fun HomeScreen(navController: NavController) {
                         style = MaterialTheme.typography.bodyLarge
                     )
                     Spacer(modifier = Modifier.height(16.dp))
-                    Button(onClick = { firebaseAuth.signOut() }) {
-                        Text("Logout")
-                    }
                 }
 
                 TextField(
