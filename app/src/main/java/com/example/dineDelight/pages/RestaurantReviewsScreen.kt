@@ -51,7 +51,7 @@ fun RestaurantReviewsScreen(navController: NavController, restaurant: Restaurant
     val coroutineScope = rememberCoroutineScope()
 
     LaunchedEffect(restaurant) {
-        reviews = ReviewRepository.getRestaurantReviews(restaurant.id)
+        reviews = ReviewRepository.getRestaurantReviews(restaurant.id).sortedByDescending { it.createdAt }
     }
 
     val imagePickerLauncher = rememberLauncherForActivityResult(
@@ -164,7 +164,7 @@ fun RestaurantReviewsScreen(navController: NavController, restaurant: Restaurant
                                     imageId = imageId
                                 )
                                 ReviewRepository.addReview(review)
-                                reviews = ReviewRepository.getRestaurantReviews(restaurant.id)
+                                reviews = ReviewRepository.getRestaurantReviews(restaurant.id).sortedByDescending { it.createdAt }
                                 withContext(Dispatchers.Main) {
                                     showReviewDialog = false
                                     reviewText = ""
