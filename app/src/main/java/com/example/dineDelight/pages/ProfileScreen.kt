@@ -34,7 +34,7 @@ fun ProfileScreen(navController: NavController) {
     val user = firebaseAuth.currentUser
     val userId = user?.uid.orEmpty()
     var userName by rememberSaveable { mutableStateOf(user?.displayName.orEmpty()) }
-    val userEmail = user?.email.orEmpty()
+    val userEmail by rememberSaveable { mutableStateOf(user?.email.orEmpty()) }
 
     var profileImageUri by rememberSaveable { mutableStateOf<Uri?>(null) }
     var isLoading by rememberSaveable { mutableStateOf(false) }
