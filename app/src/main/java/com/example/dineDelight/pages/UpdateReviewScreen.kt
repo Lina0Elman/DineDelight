@@ -33,6 +33,7 @@ fun UpdateReviewScreen(navController: NavController, reviewId: String) {
     var updatedText by remember { mutableStateOf("") }
     var updatedImageUri by remember { mutableStateOf<Uri?>(null) }
     var showDialog by remember { mutableStateOf(false) }
+    var errorMessage by remember { mutableStateOf<String?>(null) }
     val coroutineScope = rememberCoroutineScope()
     val context = LocalContext.current
 
@@ -51,7 +52,13 @@ fun UpdateReviewScreen(navController: NavController, reviewId: String) {
         ActivityResultContracts.GetContent()
     ) { uri: Uri? ->
         uri?.let { selectedUri ->
-            updatedImageUri = selectedUri
+            val blob = selectedUri.toBlob(context)!!.toBase64String()
+            if (blob.length > 1048487) {
+                errorMessage = "Image size exceeds the limit."
+            } else {
+                updatedImageUri = selectedUri
+                errorMessage = null
+            }
         }
     }
 
@@ -106,6 +113,14 @@ fun UpdateReviewScreen(navController: NavController, reviewId: String) {
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Text("Save Changes")
+            }
+
+            errorMessage?.let {
+                Text(
+                    text = it,
+                    color = MaterialTheme.colorScheme.error,
+                    style = MaterialTheme.typography.bodyMedium
+                )
             }
         } else {
             Text(text = "Loading review...", style = MaterialTheme.typography.bodyLarge)
