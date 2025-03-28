@@ -7,6 +7,9 @@ import android.net.Uri
 import android.provider.MediaStore
 import java.io.ByteArrayOutputStream
 import android.util.Base64
+import java.util.UUID
+import java.io.File
+import java.io.FileOutputStream
 
 object BlobUtils {
     fun Uri.toBlob(context: Context): ByteArray? {
@@ -38,14 +41,14 @@ object BlobUtils {
         return BitmapFactory.decodeByteArray(this, 0, this.size)
     }
 
-    fun Bitmap.toUri(context: Context): Uri? {
+    fun Bitmap.toStoredUri(context: Context): Uri? {
         return try {
             val bytes = ByteArrayOutputStream()
             this.compress(Bitmap.CompressFormat.PNG, 100, bytes)
-            val path = MediaStore.Images.Media.insertImage(context.contentResolver, this, "Title", null)
+            val uniqueFileName = "stored-image-${UUID.randomUUID()}.png"
+            val path = MediaStore.Images.Media.insertImage(context.contentResolver, this, uniqueFileName, null)
             Uri.parse(path)
-        }
-        catch (e: Exception) {
+        } catch (e: Exception) {
             null
         }
     }
@@ -62,5 +65,27 @@ object BlobUtils {
      */
     fun ByteArray.toBase64String(): String {
         return Base64.encodeToString(this, Base64.DEFAULT)
+    }
+
+    fun Uri.toBitmap(context: Context): Bitmap? {
+        return try {
+            val inputStream = context.contentResolver.openInputStream(this)
+            BitmapFactory.decodeStream(inputStream)
+        } catch (e: Exception) {
+            null
+        }
+    }
+
+    fun Bitmap.toUri(context: Context): Uri? {
+        return try {
+            val file = File(context.cacheDir, "temp-image-${UUID.randomUUID()}.png")
+            val outputStream = FileOutputStream(file)
+            this.compress(Bitmap.CompressFormat.PNG, 100, outputStream)
+            outputStream.flush()
+            outputStream.close()
+            Uri.fromFile(file)
+        } catch (e: Exception) {
+            null
+        }
     }
 } 
