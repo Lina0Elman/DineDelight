@@ -10,5 +10,6 @@ data class Review(
     val restaurantId: Int = 0,
     val restaurantName: String = "",
     val text: String = "",
-    val imageId: String? = null
+    val imageId: String? = null,
+    val createdAt: Long = System.currentTimeMillis()
 )
