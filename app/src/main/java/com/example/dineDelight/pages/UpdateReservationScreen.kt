@@ -43,21 +43,22 @@ fun UpdateReservationScreen(navController: NavController, reservationId: UUID) {
     var availableSlots by remember { mutableStateOf<List<String>>(emptyList()) }
     var selectedSlot by remember { mutableStateOf<String?>(null) }
     var showDialog by remember { mutableStateOf(false) }
+    var isLoading by remember { mutableStateOf(true) } // Ensure proper loading state
     val coroutineScope = rememberCoroutineScope()
 
-    // Fetch reservation and available slots in a coroutine
+    // Fetch reservation and available slots
     LaunchedEffect(reservationId) {
         coroutineScope.launch {
             try {
-                // Fetch the reservation
                 reservation = ReservationRepository.getReservationById(reservationId.toString())
                 reservation?.let {
-                    // Fetch available slots excluding user's reservations
                     availableSlots = ReservationRepository.getAvailableSlotsExcludingUserReservations(userId, it.restaurantId)
                     selectedSlot = it.time // Set initial slot
                 }
             } catch (e: Exception) {
                 Log.e("UpdateReservationScreen", "Error fetching data: ${e.message}")
+            } finally {
+                isLoading = false // Mark loading as complete
             }
         }
     }
@@ -74,29 +75,36 @@ fun UpdateReservationScreen(navController: NavController, reservationId: UUID) {
         Text(text = "Update Reservation", style = MaterialTheme.typography.titleLarge)
         Spacer(modifier = Modifier.height(16.dp))
 
-        // Show available slots if data is loaded
-        if (reservation != null && availableSlots.isNotEmpty()) {
-            LazyColumn {
-                items(availableSlots) { slot ->
-                    Button(
-                        onClick = {
-                            selectedSlot = slot
-                            showDialog = true
-                        },
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(vertical = 4.dp)
-                    ) {
-                        Text(text = "Change to $slot")
+        // Only show content when not loading
+        if (isLoading) {
+            Text(text = "Loading reservation details...", style = MaterialTheme.typography.bodyLarge)
+        } else if (reservation == null) {
+            Text(text = "Reservation not found.", style = MaterialTheme.typography.bodyLarge)
+        } else {
+            // Show available slots
+            if (availableSlots.isNotEmpty()) {
+                LazyColumn {
+                    items(availableSlots) { slot ->
+                        Button(
+                            onClick = {
+                                selectedSlot = slot
+                                showDialog = true
+                            },
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(vertical = 4.dp)
+                        ) {
+                            Text(text = "Change to $slot")
+                        }
                     }
                 }
+            } else {
+                Text(text = "No available slots for this reservation.", style = MaterialTheme.typography.bodyLarge)
             }
-        } else {
-            Text(text = "Loading reservation details...", style = MaterialTheme.typography.bodyLarge)
         }
     }
 
-    // Show confirmation dialog for updating the reservation
+    // Confirmation dialog
     if (showDialog && selectedSlot != null) {
         AlertDialog(
             onDismissRequest = { showDialog = false },
