@@ -2,6 +2,9 @@ package com.example.dineDelight.repositories
 
 import com.example.dineDelight.models.Reservation
 import com.google.firebase.firestore.FirebaseFirestore
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.tasks.await
@@ -12,6 +15,23 @@ object ReservationRepository {
 
     private val _reservations = MutableStateFlow<List<Reservation>>(emptyList())
     val reservations: StateFlow<List<Reservation>> get() = _reservations
+
+    init {
+        // Fetch initial reservations from Firestore in a coroutine
+        CoroutineScope(Dispatchers.IO).launch {
+            fetchInitialReservations()
+        }
+    }
+
+    private suspend fun fetchInitialReservations() {
+        try {
+            val initialReservations = reservationsCollection.get().await().toObjects(Reservation::class.java)
+            _reservations.value = initialReservations
+        } catch (e: Exception) {
+            // Handle any errors
+            throw e
+        }
+    }
 
     suspend fun addReservation(reservation: Reservation) {
         try {
