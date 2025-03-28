@@ -1,6 +1,5 @@
 package com.example.dineDelight.pages
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -11,25 +10,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.google.firebase.auth.FirebaseAuth
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Star
-import androidx.compose.material3.Icon
 import androidx.compose.foundation.lazy.items
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import coil.compose.AsyncImage
-import com.example.dineDelight.models.Reservation
 import com.example.dineDelight.models.Restaurant
-import com.example.dineDelight.models.Review
 import com.example.dineDelight.repositories.ReservationRepository
 import com.example.dineDelight.repositories.RestaurantRepository
-import com.example.dineDelight.repositories.ReviewRepository
-import com.example.dineDelight.repositories.ReviewRepository.addReview
 import com.example.dineDelight.views.BottomNavigationBar
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import java.util.UUID
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -38,7 +26,12 @@ fun HomeScreen(navController: NavController) {
     val firebaseAuth = FirebaseAuth.getInstance()
     var currentUser by remember { mutableStateOf(firebaseAuth.currentUser) }
     var searchQuery by remember { mutableStateOf("") }
-    val restaurants = RestaurantRepository.getRestaurants()
+    val restaurantsState = remember { mutableStateOf<List<Restaurant>>(emptyList()) }
+
+    LaunchedEffect(Unit) {
+        val loadedRestaurants = RestaurantRepository.getRestaurants()
+        restaurantsState.value = loadedRestaurants
+    }
 
     if (currentUser !== null) {
         LaunchedEffect(currentUser?.uid) {
@@ -99,7 +92,7 @@ fun HomeScreen(navController: NavController) {
                 )
 
                 LazyColumn {
-                    items(restaurants.filter { it.name.contains(searchQuery, ignoreCase = true) }) { restaurant ->
+                    items(restaurantsState.value.filter { it.name.contains(searchQuery, ignoreCase = true) }) { restaurant ->
                         RestaurantCard(restaurant) {
                             navController.navigate("restaurant/${restaurant.id}")
                         }
