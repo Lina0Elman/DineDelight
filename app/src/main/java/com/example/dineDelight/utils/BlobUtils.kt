@@ -7,6 +7,7 @@ import android.net.Uri
 import android.provider.MediaStore
 import java.io.ByteArrayOutputStream
 import android.util.Base64
+import java.util.UUID
 
 object BlobUtils {
     fun Uri.toBlob(context: Context): ByteArray? {
@@ -42,10 +43,10 @@ object BlobUtils {
         return try {
             val bytes = ByteArrayOutputStream()
             this.compress(Bitmap.CompressFormat.PNG, 100, bytes)
-            val path = MediaStore.Images.Media.insertImage(context.contentResolver, this, "Title", null)
+            val uniqueFileName = "Title-${UUID.randomUUID()}.jpg"
+            val path = MediaStore.Images.Media.insertImage(context.contentResolver, this, uniqueFileName, null)
             Uri.parse(path)
-        }
-        catch (e: Exception) {
+        } catch (e: Exception) {
             null
         }
     }
