@@ -21,12 +21,14 @@ import kotlinx.coroutines.launch
 fun UserReservationsScreen(navController: NavController) {
     val userId = FirebaseAuth.getInstance().currentUser?.uid.orEmpty()
     var reservations by remember { mutableStateOf<List<Reservation>>(emptyList()) }
+    var isLoading by remember { mutableStateOf(true) }
     val coroutineScope = rememberCoroutineScope()
 
     // Fetch reservations in a coroutine when the screen is first launched
     LaunchedEffect(userId) {
         coroutineScope.launch {
             reservations = ReservationRepository.getUserReservations(userId)
+            isLoading = false
         }
     }
 
@@ -50,7 +52,9 @@ fun UserReservationsScreen(navController: NavController) {
             verticalArrangement = Arrangement.Top,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            if (reservations.isEmpty()) {
+            if (isLoading) {
+                CircularProgressIndicator()
+            } else if (reservations.isEmpty()) {
                 Text(text = "You have no reservations yet", style = MaterialTheme.typography.bodyLarge)
             } else {
                 LazyColumn {
