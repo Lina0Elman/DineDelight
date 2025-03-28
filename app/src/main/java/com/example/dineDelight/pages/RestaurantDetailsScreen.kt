@@ -34,7 +34,10 @@ fun RestaurantDetailsScreen(navController: NavController, restaurant: Restaurant
     var loading by remember { mutableStateOf(true) }
     val context = LocalContext.current
     val db = remember {
-        Room.databaseBuilder(context, AppDatabase::class.java, "restaurant-db").build()
+        Room
+            .databaseBuilder(context, AppDatabase::class.java, "dine_delight_db")
+            .fallbackToDestructiveMigration()
+            .build()
     }
 
     LaunchedEffect(restaurant) {
