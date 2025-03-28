@@ -200,10 +200,11 @@ fun ReviewCard(review: Review) {
     var imageUri by remember { mutableStateOf<Uri?>(null) }
     var profileImageUri by remember { mutableStateOf<Uri?>(null) }
 
-    LaunchedEffect(review.imageId) {
-        if (review.imageId != null) {
+    val imageId = review.imageId
+    LaunchedEffect(imageId) {
+        if (imageId != null) {
             coroutineScope.launch {
-                val image = ImageRepository.getImageById(review.imageId)
+                val image = ImageRepository.getImageById(imageId)
                 imageUri = image?.blobBase64String?.toBlob()?.toBitmap()?.toUri(context)
             }
         }
