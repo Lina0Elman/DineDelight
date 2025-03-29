@@ -126,6 +126,17 @@ fun RestaurantReviewsScreen(navController: NavController, restaurant: Restaurant
                         Button(onClick = { imagePickerLauncher.launch("image/*") }) {
                             Text("Select Image")
                         }
+                        selectedImageUri?.let { uri ->
+                            AsyncImage(
+                                model = uri,
+                                contentDescription = "Selected Image Preview",
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .height(150.dp)
+                                    .clip(MaterialTheme.shapes.medium),
+                                contentScale = ContentScale.Crop
+                            )
+                        }
                         errorMessage?.let {
                             Text(
                                 text = it,
