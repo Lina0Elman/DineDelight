@@ -8,6 +8,10 @@ env:
   # The name of the Play Store
   playstore_name: Build
 
+# Allow the workflow to create a new release
+permissions:
+  contents: write
+
 on:
 
   push:
