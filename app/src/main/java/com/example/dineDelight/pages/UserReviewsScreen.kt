@@ -39,6 +39,8 @@ fun UserReviewsScreen(navController: NavController) {
     val userId = FirebaseAuth.getInstance().currentUser?.uid.orEmpty()
     var reviews by remember { mutableStateOf(listOf<Review>()) }
     var isLoading by remember { mutableStateOf(true) }
+    var showDeleteDialog by remember { mutableStateOf(false) }
+    var reviewToDelete by remember { mutableStateOf<Review?>(null) }
 
     LaunchedEffect(userId) {
         try {
@@ -80,19 +82,8 @@ fun UserReviewsScreen(navController: NavController) {
                         ReviewCard(
                             review = review,
                             onDelete = {
-                                // Trigger the deletion directly inside a coroutine scope
-                                CoroutineScope(Dispatchers.IO).launch {
-                                    try {
-                                        ReviewRepository.deleteReview(review.id)
-                                        val updatedReviews = ReviewRepository.getUserReviews(userId)
-                                        // Update the reviews state on the main thread
-                                        withContext(Dispatchers.Main) {
-                                            reviews = updatedReviews
-                                        }
-                                    } catch (e: Exception) {
-                                        // Handle error (e.g., show an error message)
-                                    }
-                                }
+                                reviewToDelete = review
+                                showDeleteDialog = true
                             },
                             onUpdate = {
                                 navController.navigate("update_review/${review.id}")
@@ -102,6 +93,38 @@ fun UserReviewsScreen(navController: NavController) {
                 }
             }
         }
+    }
+
+    if (showDeleteDialog && reviewToDelete != null) {
+        AlertDialog(
+            onDismissRequest = { showDeleteDialog = false },
+            title = { Text("Confirm Deletion") },
+            text = { Text("Are you sure you want to delete this review?") },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        CoroutineScope(Dispatchers.IO).launch {
+                            try {
+                                ReviewRepository.deleteReview(reviewToDelete!!.id)
+                                reviews = ReviewRepository.getUserReviews(userId)
+                            } catch (e: Exception) {
+                                // Handle error (e.g., show an error message)
+                            } finally {
+                                showDeleteDialog = false
+                                reviewToDelete = null
+                            }
+                        }
+                    }
+                ) {
+                    Text("Yes")
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showDeleteDialog = false }) {
+                    Text("No")
+                }
+            }
+        )
     }
 }
 
@@ -144,6 +167,7 @@ fun ReviewCard(review: Review, onDelete: () -> Unit, onUpdate: () -> Unit) {
                 modifier = Modifier.fillMaxWidth(),
                 verticalArrangement = Arrangement.spacedBy(4.dp)
             ) {
+                Text(text = "Restaurant: " + review.restaurantName, style = MaterialTheme.typography.bodyLarge)
                 Text(text = review.userEmail, style = MaterialTheme.typography.bodyLarge)
                 Text(text = review.text, style = MaterialTheme.typography.bodyMedium)
                 imageUri?.let {

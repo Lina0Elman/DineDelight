@@ -126,9 +126,6 @@ fun RestaurantReviewsScreen(navController: NavController, restaurant: Restaurant
                         Button(onClick = { imagePickerLauncher.launch("image/*") }) {
                             Text("Select Image")
                         }
-                        selectedImageUri?.let {
-                            Text("Image selected: ${it.lastPathSegment}")
-                        }
                         errorMessage?.let {
                             Text(
                                 text = it,

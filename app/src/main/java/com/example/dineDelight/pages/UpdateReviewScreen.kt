@@ -30,8 +30,13 @@ import java.util.UUID
 @Composable
 fun UpdateReviewScreen(navController: NavController, reviewId: String) {
     var review by remember { mutableStateOf<Review?>(null) }
+
+    var originalText by remember { mutableStateOf("") }
+    var originalImageUri by remember { mutableStateOf<Uri?>(null) }
+
     var updatedText by remember { mutableStateOf("") }
     var updatedImageUri by remember { mutableStateOf<Uri?>(null) }
+
     var showDialog by remember { mutableStateOf(false) }
     var errorMessage by remember { mutableStateOf<String?>(null) }
     val coroutineScope = rememberCoroutineScope()
@@ -41,26 +46,36 @@ fun UpdateReviewScreen(navController: NavController, reviewId: String) {
     LaunchedEffect(reviewId) {
         coroutineScope.launch {
             review = ReviewRepository.getReviewById(reviewId)
-            updatedText = review?.text.orEmpty()
-            updatedImageUri = review?.imageId?.let { imageId ->
-                ImageRepository.getImageById(imageId)?.blobBase64String?.toBlob()?.toBitmap()?.toUri(context)
+            review?.let { rev ->
+                originalText = rev.text
+                updatedText = rev.text
+                // Convert existing image to Uri, if present
+                originalImageUri = rev.imageId?.let { imageId ->
+                    ImageRepository.getImageById(imageId)
+                        ?.blobBase64String
+                        ?.toBlob()
+                        ?.toBitmap()
+                        ?.toUri(context)
+                }
+                updatedImageUri = originalImageUri
             }
         }
     }
 
     val imagePickerLauncher = rememberLauncherForActivityResult(
-        ActivityResultContracts.GetContent()
-    ) { uri: Uri? ->
-        uri?.let { selectedUri ->
-            val blob = selectedUri.toBlob(context)!!.toBase64String()
-            if (blob.length > 1048487) {
-                errorMessage = "Image size exceeds the limit."
-            } else {
-                updatedImageUri = selectedUri
-                errorMessage = null
+        contract = ActivityResultContracts.GetContent(),
+        onResult = { uri: Uri? ->
+            uri?.let { selectedUri ->
+                val blob = selectedUri.toBlob(context)?.toBase64String() ?: ""
+                if (blob.length > 1048487) {
+                    errorMessage = "Image size exceeds the limit."
+                } else {
+                    updatedImageUri = selectedUri
+                    errorMessage = null
+                }
             }
         }
-    }
+    )
 
     Column(
         modifier = Modifier
@@ -85,9 +100,9 @@ fun UpdateReviewScreen(navController: NavController, reviewId: String) {
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            updatedImageUri?.let {
+            updatedImageUri?.let { uri ->
                 AsyncImage(
-                    model = it,
+                    model = uri,
                     contentDescription = null,
                     modifier = Modifier
                         .fillMaxWidth()
@@ -133,29 +148,50 @@ fun UpdateReviewScreen(navController: NavController, reviewId: String) {
             title = { Text("Confirm Update") },
             text = { Text("Are you sure you want to update this review?") },
             confirmButton = {
-                TextButton(onClick = {
-                    review?.let {
-                        coroutineScope.launch {
-                            var newImageId = it.imageId
-                            updatedImageUri?.let { uri ->
-                                val blob = uri.toBlob(context)
-                                val base64String = blob?.toBase64String()
-                                if (!base64String.isNullOrEmpty()) {
-                                    val newImage = Image(
-                                        id = it.imageId ?: UUID.randomUUID().toString(),
-                                        blobBase64String = base64String
+                TextButton(
+                    onClick = {
+                        review?.let { oldReview ->
+                            coroutineScope.launch {
+                                try {
+                                    // If the user selected a new image, re-upload it
+                                    var newImageId = oldReview.imageId
+                                    if (updatedImageUri != originalImageUri && updatedImageUri != null) {
+                                        val blob = updatedImageUri?.toBlob(context)
+                                        val base64String = blob?.toBase64String()
+                                        if (!base64String.isNullOrEmpty()) {
+                                            val newImage = Image(
+                                                id = oldReview.imageId ?: UUID.randomUUID().toString(),
+                                                blobBase64String = base64String
+                                            )
+                                            ImageRepository.addImage(newImage)
+                                            newImageId = newImage.id
+                                        }
+                                    }
+
+                                    // Only update the text if it changed
+                                    val newText = if (updatedText != originalText) {
+                                        updatedText
+                                    } else {
+                                        originalText
+                                    }
+
+                                    // Build the updated review
+                                    val updatedReview = oldReview.copy(
+                                        text = newText,
+                                        imageId = newImageId
                                     )
-                                    ImageRepository.addImage(newImage)
-                                    newImageId = newImage.id
+
+                                    ReviewRepository.updateReview(updatedReview)
+                                    navController.popBackStack()
+                                } catch (e: Exception) {
+                                    errorMessage = e.message
+                                } finally {
+                                    showDialog = false
                                 }
                             }
-                            val updatedReview = it.copy(text = updatedText, imageId = newImageId)
-                            ReviewRepository.updateReview(updatedReview)
                         }
                     }
-                    showDialog = false
-                    navController.popBackStack()
-                }) {
+                ) {
                     Text("Yes")
                 }
             },

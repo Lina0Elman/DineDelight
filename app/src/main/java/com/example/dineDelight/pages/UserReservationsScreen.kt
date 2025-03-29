@@ -15,18 +15,21 @@ import com.example.dineDelight.views.BottomNavigationBar
 import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.launch
 
-
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun UserReservationsScreen(navController: NavController) {
     val userId = FirebaseAuth.getInstance().currentUser?.uid.orEmpty()
     var reservations by remember { mutableStateOf<List<Reservation>>(emptyList()) }
+    var isLoading by remember { mutableStateOf(true) }
+    var showDeleteDialog by remember { mutableStateOf(false) }
+    var reservationToDelete by remember { mutableStateOf<Reservation?>(null) }
     val coroutineScope = rememberCoroutineScope()
 
     // Fetch reservations in a coroutine when the screen is first launched
     LaunchedEffect(userId) {
         coroutineScope.launch {
             reservations = ReservationRepository.getUserReservations(userId)
+            isLoading = false
         }
     }
 
@@ -50,7 +53,9 @@ fun UserReservationsScreen(navController: NavController) {
             verticalArrangement = Arrangement.Top,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            if (reservations.isEmpty()) {
+            if (isLoading) {
+                CircularProgressIndicator()
+            } else if (reservations.isEmpty()) {
                 Text(text = "You have no reservations yet", style = MaterialTheme.typography.bodyLarge)
             } else {
                 LazyColumn {
@@ -58,10 +63,8 @@ fun UserReservationsScreen(navController: NavController) {
                         ReservationCard(
                             reservation,
                             onDelete = {
-                                coroutineScope.launch {
-                                    ReservationRepository.deleteReservation(reservation.id)
-                                    reservations = ReservationRepository.getUserReservations(userId)
-                                }
+                                reservationToDelete = reservation
+                                showDeleteDialog = true
                             },
                             onUpdate = {
                                 navController.navigate("update_reservation/${reservation.id}")
@@ -71,6 +74,39 @@ fun UserReservationsScreen(navController: NavController) {
                 }
             }
         }
+    }
+
+    if (showDeleteDialog && reservationToDelete != null) {
+        AlertDialog(
+            onDismissRequest = { showDeleteDialog = false },
+            title = { Text("Confirm Deletion") },
+            text = { Text("Are you sure you want to delete this reservation?") },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        reservationToDelete?.let { reservation ->
+                            coroutineScope.launch {
+                                try {
+                                    ReservationRepository.deleteReservation(reservation.id)
+                                    reservations = ReservationRepository.getUserReservations(userId)
+                                } catch (e: Exception) {
+                                    // Handle error (e.g., show a Snackbar or Toast)
+                                }
+                            }
+                        }
+                        showDeleteDialog = false
+                        reservationToDelete = null
+                    }
+                ) {
+                    Text("Yes")
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showDeleteDialog = false }) {
+                    Text("No")
+                }
+            }
+        )
     }
 }
 
