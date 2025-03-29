@@ -27,7 +27,7 @@ jobs:
 
       # Import google-services.json from GitHub Secrets
       - name: Create google-services.json
-        run: echo "${{ secrets.GOOGLE_SERVICES_JSON }}" > ${{ env.main_project_module }}/src/google-services.json
+        run: echo "${{ secrets.GOOGLE_SERVICES_JSON }}" | base64 -d > ${{ env.main_project_module }}/src/google-services.json
 
       # Set Current Date As Env Variable
       - name: Set current date as env variable
