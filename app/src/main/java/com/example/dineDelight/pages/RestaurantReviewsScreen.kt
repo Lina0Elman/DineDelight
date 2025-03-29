@@ -114,15 +114,21 @@ fun RestaurantReviewsScreen(navController: NavController, restaurant: Restaurant
         if (showReviewDialog) {
             AlertDialog(
                 title = {
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                        modifier = Modifier.fillMaxWidth()
+                    Box(
+                        modifier = Modifier.fillMaxWidth(),
+                        contentAlignment = Alignment.Center
                     ) {
-                        IconButton(onClick = { showReviewDialog = false }) {
-                            Icon(imageVector = Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            modifier = Modifier.fillMaxWidth()
+                        ) {
+                            IconButton(onClick = { showReviewDialog = false }) {
+                                Icon(imageVector = Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
+                            }
+                            Spacer(modifier = Modifier.weight(1f)) // Spacer to push title to the center
+                            Text("Leave a Review")
+                            Spacer(modifier = Modifier.width(48.dp)) // Spacer to maintain space on the right
                         }
-                        Spacer(modifier = Modifier.weight(1f))
-                        Text("Leave a Review")
                     }
                 },
                 onDismissRequest = { showReviewDialog = false },
