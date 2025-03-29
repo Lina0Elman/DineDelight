@@ -31,7 +31,7 @@ jobs:
 
       # Set Current Date As Env Variable
       - name: Set current date as env variable
-        run: echo "date_today=$(date +'%Y-%m-%d')" >> $GITHUB_ENV
+        run: echo "date_today=$(date +'%Y-%m-%dT%H-%M-%S')" >> $GITHUB_ENV
 
       # Set Repository Name As Env Variable
       - name: Set repository name as env variable
