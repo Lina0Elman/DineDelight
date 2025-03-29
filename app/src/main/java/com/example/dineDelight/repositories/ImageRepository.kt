@@ -111,7 +111,8 @@ object ImageRepository {
 
     private fun compressImage(image: Image): Image {
         val maxSize = 1048487 // 1 MB in bytes
-        var compressedImage = image // Start with the original image
+        val resizedImage = resizeImage(image, 700) // Resize the image first
+        var compressedImage = resizedImage // Start with the resized image
 
         // Check the size of the image and compress if necessary
         while (getImageSize(compressedImage) > maxSize) {
@@ -120,6 +121,28 @@ object ImageRepository {
         }
 
         return compressedImage // Return the compressed image
+    }
+
+    private fun resizeImage(image: Image, maxDimension: Int): Image {
+        val blob = image.blobBase64String!!.toBlob()
+        val originalBitmap = BitmapFactory.decodeByteArray(blob, 0, blob!!.size)
+        val width = originalBitmap.width
+        val height = originalBitmap.height
+
+        // Calculate the scaling factor
+        val scaleFactor = Math.min(maxDimension.toFloat() / width, maxDimension.toFloat() / height)
+
+        // Create a new bitmap with the new dimensions
+        val newWidth = (width * scaleFactor).toInt()
+        val newHeight = (height * scaleFactor).toInt()
+        val resizedBitmap = Bitmap.createScaledBitmap(originalBitmap, newWidth, newHeight, true)
+
+        // Convert the resized bitmap back to a byte array
+        val byteArrayOutputStream = ByteArrayOutputStream()
+        resizedBitmap.compress(Bitmap.CompressFormat.JPEG, 100, byteArrayOutputStream)
+        val resizedImageBytes = byteArrayOutputStream.toByteArray()
+
+        return Image(id = image.id, blobBase64String = resizedImageBytes.toBase64String())
     }
 
     private fun getImageSize(image: Image): Int {
