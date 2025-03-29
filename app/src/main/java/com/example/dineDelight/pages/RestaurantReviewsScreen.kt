@@ -30,7 +30,6 @@ import com.example.dineDelight.utils.BlobUtils.toBlob
 import com.example.dineDelight.utils.BlobUtils.toBitmap
 import com.example.dineDelight.utils.BlobUtils.toUri
 import com.google.firebase.auth.FirebaseAuth
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -180,13 +179,10 @@ fun RestaurantReviewsScreen(navController: NavController, restaurant: Restaurant
                                     val imageId = UUID.randomUUID().toString()
                                     withContext(Dispatchers.IO) {
                                         selectedImageUri?.let { uri ->
-                                            val blob = uri.toBlob(context)!!.toBase64String()
-                                            if (blob.length > 1048487) {
-                                                throw IllegalArgumentException("Image size exceeds the limit.")
-                                            }
+                                            val blobBase64String = uri.toBlob(context)!!.toBase64String()
                                             ImageRepository.addImage(Image(
                                                 id = imageId,
-                                                blobBase64String = blob
+                                                blobBase64String = blobBase64String
                                             ))
                                         }
                                     }

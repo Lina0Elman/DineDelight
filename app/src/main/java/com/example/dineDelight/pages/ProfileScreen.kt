@@ -71,14 +71,10 @@ fun ProfileScreen(navController: NavController) {
                     val blob = selectedUri.toBlob(context)
                     val base64String = blob?.toBase64String()
                     if (!base64String.isNullOrEmpty()) {
-                        if (base64String.length > 1048487) {
-                            throw IllegalArgumentException("Image size exceeds the limit.")
-                        }
-                        val newImage = Image(
+                        ImageRepository.addImage(Image(
                             id = userId,
                             blobBase64String = base64String
-                        )
-                        ImageRepository.addImage(newImage)
+                        ))
 
                         val updates = userProfileChangeRequest {
                             photoUri = selectedUri
@@ -157,7 +153,7 @@ fun ProfileScreen(navController: NavController) {
                     coroutineScope.launch {
                         try {
                             val updates = userProfileChangeRequest {
-                                displayName = userName
+                                displayName = userName.trim()
                             }
                             user?.updateProfile(updates)
                         } catch (e: Exception) {

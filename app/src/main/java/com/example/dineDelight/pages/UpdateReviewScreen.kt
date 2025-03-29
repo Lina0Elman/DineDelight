@@ -66,13 +66,8 @@ fun UpdateReviewScreen(navController: NavController, reviewId: String) {
         contract = ActivityResultContracts.GetContent(),
         onResult = { uri: Uri? ->
             uri?.let { selectedUri ->
-                val blob = selectedUri.toBlob(context)?.toBase64String() ?: ""
-                if (blob.length > 1048487) {
-                    errorMessage = "Image size exceeds the limit."
-                } else {
-                    updatedImageUri = selectedUri
-                    errorMessage = null
-                }
+                updatedImageUri = selectedUri
+                errorMessage = null
             }
         }
     )
@@ -157,13 +152,12 @@ fun UpdateReviewScreen(navController: NavController, reviewId: String) {
                                     var newImageId = oldReview.imageId
                                     if (updatedImageUri != originalImageUri && updatedImageUri != null) {
                                         val blob = updatedImageUri?.toBlob(context)
-                                        val base64String = blob?.toBase64String()
-                                        if (!base64String.isNullOrEmpty()) {
-                                            val newImage = Image(
+                                        val blobBase64String = blob?.toBase64String()
+                                        if (!blobBase64String.isNullOrEmpty()) {
+                                            val newImage = ImageRepository.addImage(Image(
                                                 id = oldReview.imageId ?: UUID.randomUUID().toString(),
-                                                blobBase64String = base64String
-                                            )
-                                            ImageRepository.addImage(newImage)
+                                                blobBase64String = blobBase64String
+                                            ))
                                             newImageId = newImage.id
                                         }
                                     }

@@ -11,6 +11,11 @@ import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.tasks.await
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
+import com.example.dineDelight.utils.BlobUtils.toBase64String
+import com.example.dineDelight.utils.BlobUtils.toBlob
+import java.io.ByteArrayOutputStream
 
 object ImageRepository {
     private lateinit var imageDao: ImageDao
@@ -32,14 +37,18 @@ object ImageRepository {
         imageDao = db.imageDao()
     }
 
-    suspend fun addImage(image: Image) {
+    suspend fun addImage(image: Image): Image {
         try {
-            val imageEntity = image.toImageEntity()
+            // Compress the image before adding
+            val compressedImage = compressImage(image)
+            val imageEntity = compressedImage.toImageEntity()
             imageDao.insertImage(imageEntity)
             // Add image to Firestore
-            imagesCollection.document(image.id).set(image).await()
+            imagesCollection.document(compressedImage.id).set(compressedImage).await()
             // Update local state flow after adding
-            _images.value += image
+            _images.value += compressedImage
+
+            return compressedImage
         } catch (e: Exception) {
             // Handle any errors
             throw e
@@ -98,5 +107,68 @@ object ImageRepository {
             // Handle any errors
             throw e
         }
+    }
+
+    private fun compressImage(image: Image): Image {
+        val maxSize = 1048487 // 1 MB in bytes
+        val resizedImage = resizeImage(image, 700) // Resize the image first
+        var compressedImage = resizedImage // Start with the resized image
+
+        // Check the size of the image and compress if necessary
+        while (getImageSize(compressedImage) > maxSize) {
+            // Reduce the quality of the image
+            compressedImage = reduceImageQuality(compressedImage)
+        }
+
+        return compressedImage // Return the compressed image
+    }
+
+    private fun resizeImage(image: Image, maxDimension: Int): Image {
+        val blob = image.blobBase64String!!.toBlob()
+        val originalBitmap = BitmapFactory.decodeByteArray(blob, 0, blob!!.size)
+        val width = originalBitmap.width
+        val height = originalBitmap.height
+
+        // Calculate the scaling factor
+        val scaleFactor = Math.min(maxDimension.toFloat() / width, maxDimension.toFloat() / height)
+
+        // Create a new bitmap with the new dimensions
+        val newWidth = (width * scaleFactor).toInt()
+        val newHeight = (height * scaleFactor).toInt()
+        val resizedBitmap = Bitmap.createScaledBitmap(originalBitmap, newWidth, newHeight, true)
+
+        // Convert the resized bitmap back to a byte array
+        val byteArrayOutputStream = ByteArrayOutputStream()
+        resizedBitmap.compress(Bitmap.CompressFormat.JPEG, 100, byteArrayOutputStream)
+        val resizedImageBytes = byteArrayOutputStream.toByteArray()
+
+        return Image(id = image.id, blobBase64String = resizedImageBytes.toBase64String())
+    }
+
+    private fun getImageSize(image: Image): Int {
+        // Convert the image to a byte array and return its size
+        val byteArrayOutputStream = ByteArrayOutputStream()
+        val blob = image.blobBase64String!!.toBlob()
+        val bitmap = BitmapFactory.decodeByteArray(blob, 0, blob!!.size)
+        bitmap.compress(Bitmap.CompressFormat.JPEG, 100, byteArrayOutputStream) // Compress to JPEG format
+        return byteArrayOutputStream.size() // Return the size in bytes
+    }
+
+    private fun reduceImageQuality(image: Image): Image {
+        val byteArrayOutputStream = ByteArrayOutputStream()
+        val blob = image.blobBase64String!!.toBlob()
+        val bitmap = BitmapFactory.decodeByteArray(blob, 0, blob!!.size)
+
+        // Start with a quality of 100 and reduce until the size is acceptable
+        var quality = 100
+        do {
+            byteArrayOutputStream.reset() // Clear the output stream
+            bitmap.compress(Bitmap.CompressFormat.JPEG, quality, byteArrayOutputStream)
+            quality -= 10 // Reduce quality by 10 each iteration
+        } while (getImageSize(image) > 1048487 && quality > 0)
+
+        // Create a new Image object from the compressed byte array
+        val compressedImageBytes = byteArrayOutputStream.toByteArray()
+        return Image(id = image.id, blobBase64String = compressedImageBytes.toBase64String())
     }
 }

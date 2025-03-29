@@ -44,7 +44,7 @@ fun UserReviewsScreen(navController: NavController) {
 
     LaunchedEffect(userId) {
         try {
-            reviews = ReviewRepository.getUserReviews(userId)
+            reviews = ReviewRepository.getUserReviews(userId).sortedByDescending { it.createdAt }
         } catch (e: Exception) {
             // Handle error (e.g., show an error message)
         } finally {
