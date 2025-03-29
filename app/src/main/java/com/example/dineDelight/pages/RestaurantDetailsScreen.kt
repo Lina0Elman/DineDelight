@@ -154,7 +154,7 @@ fun MealCard(meal: Meal) {
                 modifier = Modifier.weight(1f),
                 horizontalAlignment = Alignment.Start
             ) {
-                Text(text = meal.strMeal, style = MaterialTheme.typography.titleLarge)
+                Text(text = meal.strMeal, style = MaterialTheme.typography.titleMedium)
             }
             AsyncImage(
                 model = meal.strMealThumb,

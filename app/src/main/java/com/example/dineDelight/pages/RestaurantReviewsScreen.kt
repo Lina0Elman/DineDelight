@@ -164,7 +164,7 @@ fun RestaurantReviewsScreen(navController: NavController, restaurant: Restaurant
                             Text(
                                 text = it,
                                 color = MaterialTheme.colorScheme.error,
-                                style = MaterialTheme.typography.bodyMedium
+                                style = MaterialTheme.typography.bodySmall
                             )
                         }
                     }

@@ -140,7 +140,7 @@ fun ProfileScreen(navController: NavController) {
                     Text(
                         text = it,
                         color = MaterialTheme.colorScheme.error,
-                        style = MaterialTheme.typography.bodyMedium
+                        style = MaterialTheme.typography.bodySmall
                     )
                 }
                 Spacer(modifier = Modifier.height(16.dp))

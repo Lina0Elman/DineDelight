@@ -81,7 +81,7 @@ fun LoginScreen(
             Text(
                 text = errorMessage,
                 color = MaterialTheme.colorScheme.error,
-                style = MaterialTheme.typography.bodyLarge
+                style = MaterialTheme.typography.bodySmall
             )
         }
     }

@@ -134,7 +134,7 @@ fun UpdateReviewScreen(navController: NavController, reviewId: String) {
                 Text(
                     text = it,
                     color = MaterialTheme.colorScheme.error,
-                    style = MaterialTheme.typography.bodyMedium
+                    style = MaterialTheme.typography.bodySmall
                 )
             }
         } else {
