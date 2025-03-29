@@ -47,7 +47,7 @@ fun RegisterScreen(navController: NavController) {
         TextField(
             value = username,
             onValueChange = { username = it },
-            label = { Text("Username") },
+            label = { Text("Username", style = MaterialTheme.typography.bodyLarge) },
             singleLine = true,
             modifier = Modifier.fillMaxWidth()
         )
@@ -57,7 +57,7 @@ fun RegisterScreen(navController: NavController) {
         TextField(
             value = email,
             onValueChange = { email = it },
-            label = { Text("Email") },
+            label = { Text("Email", style = MaterialTheme.typography.bodyLarge) },
             singleLine = true,
             modifier = Modifier.fillMaxWidth()
         )
@@ -67,7 +67,7 @@ fun RegisterScreen(navController: NavController) {
         TextField(
             value = password,
             onValueChange = { password = it },
-            label = { Text("Password") },
+            label = { Text("Password", style = MaterialTheme.typography.bodyLarge) },
             singleLine = true,
             modifier = Modifier.fillMaxWidth(),
             visualTransformation = PasswordVisualTransformation()
@@ -78,7 +78,7 @@ fun RegisterScreen(navController: NavController) {
         TextField(
             value = confirmPassword,
             onValueChange = { confirmPassword = it },
-            label = { Text("Confirm Password") },
+            label = { Text("Confirm Password", style = MaterialTheme.typography.bodyLarge) },
             singleLine = true,
             modifier = Modifier.fillMaxWidth(),
             visualTransformation = PasswordVisualTransformation()
@@ -123,20 +123,20 @@ fun RegisterScreen(navController: NavController) {
             },
             modifier = Modifier.fillMaxWidth()
         ) {
-            Text("Register")
+            Text("Register", style = MaterialTheme.typography.bodyLarge)
         }
 
         Spacer(modifier = Modifier.height(16.dp))
 
         TextButton(onClick = { navController.navigate("login") }) {
-            Text("Already have an account? Login")
+            Text("Already have an account? Login", style = MaterialTheme.typography.bodyLarge)
         }
 
         if (errorMessage != null) {
             Text(
                 text = errorMessage!!,
                 color = MaterialTheme.colorScheme.error,
-                style = MaterialTheme.typography.bodySmall
+                style = MaterialTheme.typography.bodyLarge
             )
         }
     }

@@ -36,7 +36,7 @@ fun UserReservationsScreen(navController: NavController) {
     Scaffold(
         topBar = {
             SmallTopAppBar(
-                title = { Text("My Reservations") },
+                title = { Text("My Reservations", style = MaterialTheme.typography.titleLarge) },
                 colors = TopAppBarDefaults.smallTopAppBarColors(
                     containerColor = MaterialTheme.colorScheme.primary,
                     titleContentColor = MaterialTheme.colorScheme.onPrimary
@@ -79,8 +79,8 @@ fun UserReservationsScreen(navController: NavController) {
     if (showDeleteDialog && reservationToDelete != null) {
         AlertDialog(
             onDismissRequest = { showDeleteDialog = false },
-            title = { Text("Confirm Deletion") },
-            text = { Text("Are you sure you want to delete this reservation?") },
+            title = { Text("Confirm Deletion", style = MaterialTheme.typography.titleLarge) },
+            text = { Text("Are you sure you want to delete this reservation?", style = MaterialTheme.typography.bodyLarge) },
             confirmButton = {
                 TextButton(
                     onClick = {
@@ -98,12 +98,12 @@ fun UserReservationsScreen(navController: NavController) {
                         reservationToDelete = null
                     }
                 ) {
-                    Text("Yes")
+                    Text("Yes", style = MaterialTheme.typography.bodyLarge)
                 }
             },
             dismissButton = {
                 TextButton(onClick = { showDeleteDialog = false }) {
-                    Text("No")
+                    Text("No", style = MaterialTheme.typography.bodyLarge)
                 }
             }
         )
@@ -121,11 +121,11 @@ fun ReservationCard(reservation: Reservation, onDelete: () -> Unit, onUpdate: ()
             Text(text = "Time: ${reservation.time}", style = MaterialTheme.typography.bodyMedium)
             Row {
                 Button(onClick = onUpdate) {
-                    Text("Update")
+                    Text("Update", style = MaterialTheme.typography.bodyLarge)
                 }
                 Spacer(modifier = Modifier.width(8.dp))
                 Button(onClick = onDelete) {
-                    Text("Delete")
+                    Text("Delete", style = MaterialTheme.typography.bodyLarge)
                 }
             }
         }

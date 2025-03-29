@@ -60,7 +60,7 @@ fun ReservationScreen(navController: NavController, restaurant: Restaurant) {
                         .padding(vertical = 4.dp),
                     enabled = !isReserved
                 ) {
-                    Text(text = if (isReserved) "$slot (Reserved)" else "Reserve $slot")
+                    Text(text = if (isReserved) "$slot (Reserved)" else "Reserve $slot", style = MaterialTheme.typography.bodyLarge)
                 }
             }
         }
@@ -69,8 +69,8 @@ fun ReservationScreen(navController: NavController, restaurant: Restaurant) {
     if (showDialog && selectedSlot != null) {
         AlertDialog(
             onDismissRequest = { showDialog = false },
-            title = { Text("Confirm Reservation") },
-            text = { Text("Are you sure you want to reserve the slot at $selectedSlot?") },
+            title = { Text("Confirm Reservation", style = MaterialTheme.typography.titleLarge) },
+            text = { Text("Are you sure you want to reserve the slot at $selectedSlot?", style = MaterialTheme.typography.bodyLarge) },
             confirmButton = {
                 TextButton(
                     onClick = {
@@ -93,12 +93,12 @@ fun ReservationScreen(navController: NavController, restaurant: Restaurant) {
                         }
                     }
                 ) {
-                    Text("Yes")
+                    Text("Yes", style = MaterialTheme.typography.bodyLarge)
                 }
             },
             dismissButton = {
                 TextButton(onClick = { showDialog = false }) {
-                    Text("No")
+                    Text("No", style = MaterialTheme.typography.bodyLarge)
                 }
             }
         )

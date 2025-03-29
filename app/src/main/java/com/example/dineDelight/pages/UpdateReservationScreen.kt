@@ -94,7 +94,7 @@ fun UpdateReservationScreen(navController: NavController, reservationId: UUID) {
                                 .fillMaxWidth()
                                 .padding(vertical = 4.dp)
                         ) {
-                            Text(text = "Change to $slot")
+                            Text(text = "Change to $slot", style = MaterialTheme.typography.bodyLarge)
                         }
                     }
                 }
@@ -108,8 +108,8 @@ fun UpdateReservationScreen(navController: NavController, reservationId: UUID) {
     if (showDialog && selectedSlot != null) {
         AlertDialog(
             onDismissRequest = { showDialog = false },
-            title = { Text("Confirm Update") },
-            text = { Text("Are you sure you want to change the reservation to $selectedSlot?") },
+            title = { Text("Confirm Update", style = MaterialTheme.typography.titleLarge) },
+            text = { Text("Are you sure you want to change the reservation to $selectedSlot?", style = MaterialTheme.typography.bodyLarge) },
             confirmButton = {
                 TextButton(
                     onClick = {
@@ -127,12 +127,12 @@ fun UpdateReservationScreen(navController: NavController, reservationId: UUID) {
                         showDialog = false
                     }
                 ) {
-                    Text("Yes")
+                    Text("Yes", style = MaterialTheme.typography.bodyLarge)
                 }
             },
             dismissButton = {
                 TextButton(onClick = { showDialog = false }) {
-                    Text("No")
+                    Text("No", style = MaterialTheme.typography.bodyLarge)
                 }
             }
         )

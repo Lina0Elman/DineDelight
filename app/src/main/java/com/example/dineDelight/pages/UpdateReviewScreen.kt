@@ -94,7 +94,7 @@ fun UpdateReviewScreen(navController: NavController, reviewId: String) {
             TextField(
                 value = updatedText,
                 onValueChange = { updatedText = it },
-                label = { Text("Review") },
+                label = { Text("Review", style = MaterialTheme.typography.bodyLarge) },
                 modifier = Modifier.fillMaxWidth()
             )
 
@@ -118,7 +118,7 @@ fun UpdateReviewScreen(navController: NavController, reviewId: String) {
                 onClick = { imagePickerLauncher.launch("image/*") },
                 modifier = Modifier.fillMaxWidth()
             ) {
-                Text("Change Image")
+                Text("Change Image", style = MaterialTheme.typography.bodyLarge)
             }
 
             Spacer(modifier = Modifier.height(16.dp))
@@ -127,7 +127,7 @@ fun UpdateReviewScreen(navController: NavController, reviewId: String) {
                 onClick = { showDialog = true },
                 modifier = Modifier.fillMaxWidth()
             ) {
-                Text("Save Changes")
+                Text("Save Changes", style = MaterialTheme.typography.bodyLarge)
             }
 
             errorMessage?.let {
@@ -145,8 +145,8 @@ fun UpdateReviewScreen(navController: NavController, reviewId: String) {
     if (showDialog) {
         AlertDialog(
             onDismissRequest = { showDialog = false },
-            title = { Text("Confirm Update") },
-            text = { Text("Are you sure you want to update this review?") },
+            title = { Text("Confirm Update", style = MaterialTheme.typography.bodyLarge) },
+            text = { Text("Are you sure you want to update this review?", style = MaterialTheme.typography.bodyLarge) },
             confirmButton = {
                 TextButton(
                     onClick = {
@@ -192,12 +192,12 @@ fun UpdateReviewScreen(navController: NavController, reviewId: String) {
                         }
                     }
                 ) {
-                    Text("Yes")
+                    Text("Yes", style = MaterialTheme.typography.bodyLarge)
                 }
             },
             dismissButton = {
                 TextButton(onClick = { showDialog = false }) {
-                    Text("No")
+                    Text("No", style = MaterialTheme.typography.bodyLarge)
                 }
             }
         )

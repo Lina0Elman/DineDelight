@@ -46,7 +46,7 @@ fun LoginScreen(
         TextField(
             value = email,
             onValueChange = { email = it },
-            label = { Text("Email") },
+            label = { Text("Email", style = MaterialTheme.typography.bodyLarge) },
             singleLine = true,
             modifier = Modifier.fillMaxWidth()
         )
@@ -56,7 +56,7 @@ fun LoginScreen(
         TextField(
             value = password,
             onValueChange = { password = it },
-            label = { Text("Password") },
+            label = { Text("Password", style = MaterialTheme.typography.bodyLarge) },
             singleLine = true,
             modifier = Modifier.fillMaxWidth(),
             visualTransformation = PasswordVisualTransformation()
@@ -68,20 +68,20 @@ fun LoginScreen(
             onClick = { onLogin(email, password) },
             modifier = Modifier.fillMaxWidth()
         ) {
-            Text("Login")
+            Text("Login", style = MaterialTheme.typography.bodyLarge)
         }
 
         Spacer(modifier = Modifier.height(16.dp))
 
         TextButton(onClick = { navController.navigate("register") }) {
-            Text("Don't have an account? Register")
+            Text("Don't have an account? Register", style = MaterialTheme.typography.bodyLarge)
         }
 
         if (!errorMessage.isNullOrEmpty()) {
             Text(
                 text = errorMessage,
                 color = MaterialTheme.colorScheme.error,
-                style = MaterialTheme.typography.bodySmall
+                style = MaterialTheme.typography.bodyLarge
             )
         }
     }

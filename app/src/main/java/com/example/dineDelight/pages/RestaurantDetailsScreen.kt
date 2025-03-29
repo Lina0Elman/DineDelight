@@ -78,15 +78,15 @@ fun RestaurantDetailsScreen(navController: NavController, restaurant: Restaurant
 
             Text(text = "Restaurant Details", style = MaterialTheme.typography.titleLarge)
             Spacer(modifier = Modifier.height(16.dp))
-            Text(text = "Restaurant Name: ${restaurant.name}")
-            Text(text = "Description: ${restaurant.description}")
+            Text(text = "Restaurant Name: ${restaurant.name}", style = MaterialTheme.typography.bodyLarge)
+            Text(text = "Description: ${restaurant.description}", style = MaterialTheme.typography.bodyLarge)
             Spacer(modifier = Modifier.height(8.dp))
 
             Button(
                 onClick = { navController.navigate("reserve/${restaurant.id}") },
                 modifier = Modifier.fillMaxWidth()
             ) {
-                Text(text = "Reserve a Slot")
+                Text(text = "Reserve a Slot", style = MaterialTheme.typography.bodyLarge)
             }
 
             Spacer(modifier = Modifier.height(8.dp))
@@ -97,7 +97,7 @@ fun RestaurantDetailsScreen(navController: NavController, restaurant: Restaurant
             ) {
                 Icon(imageVector = Icons.Default.Star, contentDescription = "Leave a Review")
                 Spacer(modifier = Modifier.width(8.dp))
-                Text("View/Leave a Review")
+                Text("View/Leave a Review", style = MaterialTheme.typography.bodyLarge)
             }
 
             Spacer(modifier = Modifier.height(16.dp))
@@ -117,7 +117,7 @@ fun RestaurantDetailsScreen(navController: NavController, restaurant: Restaurant
             restaurantMenu?.let { menu ->
                 items(menu.meals) { meal -> MealCard(meal) }
             } ?: item {
-                Text(text = "No menu available.")
+                Text(text = "No menu available.", style = MaterialTheme.typography.bodyLarge)
             }
         }
     }

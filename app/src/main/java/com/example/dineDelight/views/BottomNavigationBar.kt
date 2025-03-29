@@ -36,7 +36,9 @@ fun BottomNavigationBar(navController: NavController, selectedItem: String) {
                     }
                 },
                 icon = { Icon(item.icon, item.title) },
-                label = { Text(item.title) }
+                label = { 
+                    Text(item.title, style = MaterialTheme.typography.bodyLarge) // Use your custom font style
+                }
             )
         }
     }

@@ -64,7 +64,7 @@ fun RestaurantReviewsScreen(navController: NavController, restaurant: Restaurant
         modifier = Modifier.fillMaxSize()
     ) {
         TopAppBar(
-            title = { Text("Restaurant Reviews") },
+            title = { Text("Restaurant Reviews", style = MaterialTheme.typography.titleLarge) },
             navigationIcon = {
                 IconButton(onClick = { navController.popBackStack() }) {
                     Icon(imageVector = Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
@@ -79,7 +79,7 @@ fun RestaurantReviewsScreen(navController: NavController, restaurant: Restaurant
                 .fillMaxWidth()
                 .padding(horizontal = 16.dp)
         ) {
-            Text("Leave a Review")
+            Text("Leave a Review", style = MaterialTheme.typography.bodyLarge)
         }
 
         Spacer(modifier = Modifier.height(16.dp))
@@ -126,7 +126,7 @@ fun RestaurantReviewsScreen(navController: NavController, restaurant: Restaurant
                                 Icon(imageVector = Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
                             }
                             Spacer(modifier = Modifier.weight(1f)) // Spacer to push title to the center
-                            Text("Leave a Review")
+                            Text("Leave a Review", style = MaterialTheme.typography.titleLarge)
                             Spacer(modifier = Modifier.width(48.dp)) // Spacer to maintain space on the right
                         }
                     }
@@ -137,7 +137,7 @@ fun RestaurantReviewsScreen(navController: NavController, restaurant: Restaurant
                         TextField(
                             value = reviewText,
                             onValueChange = { reviewText = it },
-                            label = { Text("Your Review") }
+                            label = { Text("Your Review", style = MaterialTheme.typography.bodyLarge) }
                         )
                         Spacer(modifier = Modifier.height(8.dp))
                         Box(
@@ -145,7 +145,7 @@ fun RestaurantReviewsScreen(navController: NavController, restaurant: Restaurant
                             contentAlignment = Alignment.Center
                         ) {
                             Button(onClick = { imagePickerLauncher.launch("image/*") }) {
-                                Text("Select Image")
+                                Text("Select Image", style = MaterialTheme.typography.bodyLarge)
                             }
                         }
                         Spacer(modifier = Modifier.height(8.dp))
@@ -215,7 +215,7 @@ fun RestaurantReviewsScreen(navController: NavController, restaurant: Restaurant
                                 }
                             }
                         }) {
-                            Text("Submit")
+                            Text("Submit", style = MaterialTheme.typography.bodyLarge)
                         }
                     }
                 }

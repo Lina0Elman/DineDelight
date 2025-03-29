@@ -134,7 +134,7 @@ fun ProfileScreen(navController: NavController) {
                 Spacer(modifier = Modifier.height(16.dp))
 
                 Button(onClick = { imagePickerLauncher.launch("image/*") }) {
-                    Text("Change Profile Picture")
+                    Text("Change Profile Picture", style = MaterialTheme.typography.bodyLarge)
                 }
                 errorMessage?.let {
                     Text(
@@ -148,7 +148,7 @@ fun ProfileScreen(navController: NavController) {
                 TextField(
                     value = userName,
                     onValueChange = { userName = it },
-                    label = { Text("Name") },
+                    label = { Text("Name", style = MaterialTheme.typography.bodyLarge) },
                     modifier = Modifier.fillMaxWidth()
                 )
                 Spacer(modifier = Modifier.height(16.dp))
@@ -165,7 +165,7 @@ fun ProfileScreen(navController: NavController) {
                         }
                     }
                 }) {
-                    Text("Update Name")
+                    Text("Update Name", style = MaterialTheme.typography.bodyLarge)
                 }
                 Spacer(modifier = Modifier.height(16.dp))
 
@@ -178,7 +178,7 @@ fun ProfileScreen(navController: NavController) {
                         popUpTo(navController.graph.startDestinationId) { inclusive = true }
                     }
                 }) {
-                    Text("Logout")
+                    Text("Logout", style = MaterialTheme.typography.bodyLarge)
                 }
             }
         }

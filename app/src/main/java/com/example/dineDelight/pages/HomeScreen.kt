@@ -56,7 +56,7 @@ fun HomeScreen(navController: NavController) {
     Scaffold(
         topBar = {
             SmallTopAppBar(
-                title = { Text("DineDelight") },
+                title = { Text("DineDelight", style = MaterialTheme.typography.titleLarge) },
                 colors = TopAppBarDefaults.smallTopAppBarColors(
                     containerColor = MaterialTheme.colorScheme.primary,
                     titleContentColor = MaterialTheme.colorScheme.onPrimary
