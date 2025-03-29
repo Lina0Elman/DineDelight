@@ -113,8 +113,19 @@ fun RestaurantReviewsScreen(navController: NavController, restaurant: Restaurant
 
         if (showReviewDialog) {
             AlertDialog(
+                title = {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        IconButton(onClick = { showReviewDialog = false }) {
+                            Icon(imageVector = Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
+                        }
+                        Spacer(modifier = Modifier.weight(1f))
+                        Text("Leave a Review")
+                    }
+                },
                 onDismissRequest = { showReviewDialog = false },
-                title = { Text("Leave a Review") },
                 text = {
                     Column {
                         TextField(
@@ -152,53 +163,53 @@ fun RestaurantReviewsScreen(navController: NavController, restaurant: Restaurant
                     }
                 },
                 confirmButton = {
-                    Button(onClick = {
-                        coroutineScope.launch {
-                            try {
-                                val imageId = UUID.randomUUID().toString()
-                                withContext(Dispatchers.IO) {
-                                    selectedImageUri?.let { uri ->
-                                        val blob = uri.toBlob(context)!!.toBase64String()
-                                        if (blob.length > 1048487) {
-                                            throw IllegalArgumentException("Image size exceeds the limit.")
+                    Box(
+                        modifier = Modifier.fillMaxWidth(),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Button(onClick = {
+                            coroutineScope.launch {
+                                try {
+                                    val imageId = UUID.randomUUID().toString()
+                                    withContext(Dispatchers.IO) {
+                                        selectedImageUri?.let { uri ->
+                                            val blob = uri.toBlob(context)!!.toBase64String()
+                                            if (blob.length > 1048487) {
+                                                throw IllegalArgumentException("Image size exceeds the limit.")
+                                            }
+                                            ImageRepository.addImage(Image(
+                                                id = imageId,
+                                                blobBase64String = blob
+                                            ))
                                         }
-                                        ImageRepository.addImage(Image(
-                                            id = imageId,
-                                            blobBase64String = blob
-                                        ))
                                     }
+                                    val review = Review(
+                                        userId = userId,
+                                        userEmail = userEmail,
+                                        restaurantId = restaurant.id,
+                                        restaurantName = restaurant.name,
+                                        text = reviewText,
+                                        imageId = imageId
+                                    )
+                                    ReviewRepository.addReview(review)
+                                    reviews = ReviewRepository.getRestaurantReviews(restaurant.id).sortedByDescending { it.createdAt }
+                                    withContext(Dispatchers.Main) {
+                                        showReviewDialog = false
+                                        reviewText = ""
+                                        selectedImageUri = null
+                                        errorMessage = null
+                                    }
+                                } catch (e: IllegalArgumentException) {
+                                    withContext(Dispatchers.Main) {
+                                        errorMessage = e.message
+                                    }
+                                } catch (e: Exception) {
+                                    e.printStackTrace()
                                 }
-                                val review = Review(
-                                    userId = userId,
-                                    userEmail = userEmail,
-                                    restaurantId = restaurant.id,
-                                    restaurantName = restaurant.name,
-                                    text = reviewText,
-                                    imageId = imageId
-                                )
-                                ReviewRepository.addReview(review)
-                                reviews = ReviewRepository.getRestaurantReviews(restaurant.id).sortedByDescending { it.createdAt }
-                                withContext(Dispatchers.Main) {
-                                    showReviewDialog = false
-                                    reviewText = ""
-                                    selectedImageUri = null
-                                    errorMessage = null
-                                }
-                            } catch (e: IllegalArgumentException) {
-                                withContext(Dispatchers.Main) {
-                                    errorMessage = e.message
-                                }
-                            } catch (e: Exception) {
-                                e.printStackTrace()
                             }
+                        }) {
+                            Text("Submit")
                         }
-                    }) {
-                        Text("Submit")
-                    }
-                },
-                dismissButton = {
-                    Button(onClick = { showReviewDialog = false }) {
-                        Text("Cancel")
                     }
                 }
             )
