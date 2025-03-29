@@ -72,7 +72,7 @@ fun RestaurantReviewsScreen(navController: NavController, restaurant: Restaurant
             }
         )
 
-        Spacer(modifier = Modifier.height(16.dp))
+        Spacer(modifier = Modifier.height(8.dp))
         Button(
             onClick = { showReviewDialog = true },
             modifier = Modifier
@@ -148,6 +148,7 @@ fun RestaurantReviewsScreen(navController: NavController, restaurant: Restaurant
                                 Text("Select Image")
                             }
                         }
+                        Spacer(modifier = Modifier.height(8.dp))
                         selectedImageUri?.let { uri ->
                             AsyncImage(
                                 model = uri,
