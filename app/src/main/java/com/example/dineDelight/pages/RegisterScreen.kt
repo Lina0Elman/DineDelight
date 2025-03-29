@@ -91,13 +91,13 @@ fun RegisterScreen(navController: NavController) {
                 if (password == confirmPassword) {
                     if (email.isNotEmpty() && password.isNotEmpty()) {
                         FirebaseAuth.getInstance()
-                            .createUserWithEmailAndPassword(email, password)
+                            .createUserWithEmailAndPassword(email.trim(), password)
                             .addOnCompleteListener { task ->
                                 if (task.isSuccessful) {
                                     // Once user is created, set displayName = username
                                     val newUser = task.result?.user
                                     val profileUpdates = userProfileChangeRequest {
-                                        displayName = username
+                                        displayName = username.trim()
                                     }
                                     newUser?.updateProfile(profileUpdates)
                                         ?.addOnCompleteListener { profileUpdateTask ->
