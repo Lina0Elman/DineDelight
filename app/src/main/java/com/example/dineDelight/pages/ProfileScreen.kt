@@ -157,7 +157,7 @@ fun ProfileScreen(navController: NavController) {
                     coroutineScope.launch {
                         try {
                             val updates = userProfileChangeRequest {
-                                displayName = userName
+                                displayName = userName.trim()
                             }
                             user?.updateProfile(updates)
                         } catch (e: Exception) {
