@@ -144,6 +144,7 @@ fun ReviewCard(review: Review, onDelete: () -> Unit, onUpdate: () -> Unit) {
                 modifier = Modifier.fillMaxWidth(),
                 verticalArrangement = Arrangement.spacedBy(4.dp)
             ) {
+                Text(text = "Restaurant: " + review.restaurantName, style = MaterialTheme.typography.bodyLarge)
                 Text(text = review.userEmail, style = MaterialTheme.typography.bodyLarge)
                 Text(text = review.text, style = MaterialTheme.typography.bodyMedium)
                 imageUri?.let {
