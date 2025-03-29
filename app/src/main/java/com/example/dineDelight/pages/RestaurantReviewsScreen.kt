@@ -123,8 +123,13 @@ fun RestaurantReviewsScreen(navController: NavController, restaurant: Restaurant
                             label = { Text("Your Review") }
                         )
                         Spacer(modifier = Modifier.height(8.dp))
-                        Button(onClick = { imagePickerLauncher.launch("image/*") }) {
-                            Text("Select Image")
+                        Box(
+                            modifier = Modifier.fillMaxWidth(),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Button(onClick = { imagePickerLauncher.launch("image/*") }) {
+                                Text("Select Image")
+                            }
                         }
                         selectedImageUri?.let { uri ->
                             AsyncImage(
