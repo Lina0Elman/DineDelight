@@ -104,8 +104,8 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ${{ env.main_project_module }}/build/outputs/apk/release/app-release.apk
-          asset_name: app-release-${{ env.date_today }}.apk
+          asset_path: ${{ env.main_project_module }}/build/outputs/apk/release/app-release-unsigned.apk
+          asset_name: app-release-unsigned-${{ env.date_today }}.apk
           asset_content_type: application/vnd.android.package-archive
 
       # UPLOAD AAB RELEASE
