@@ -1,4 +1,4 @@
-name: Generated APK AAB (Upload - Create Release on GitHub)
+name: Publish Build APK AAB Artifacts
 # See https://github.com/marketplace/actions/automated-build-android-app-with-github-action
 
 env:
